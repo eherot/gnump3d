@@ -1,0 +1,303 @@
+
+GNUMP3d - The GNU Streaming MP3 / OGG Vorbis Server.
+
+
+Homepage: http://www.gnump3d.org/
+Version : 3.0
+Author  : Steve Kemp <steve@steve.org.uk>
+
+
+
+
+NOTE
+----
+
+  All development of this branch of the project has ceased.
+   
+  In the future there might be a GNUMP3d 3.x branch writen in
+ modern Perl, or Ruby, supporting an SQLite back-end.  However
+ there are no plans to start on this in the short-term future.
+
+
+
+
+
+Contents
+--------
+
+   This README file is split into the following sections.
+ Please read it all before reporting bugs, or problems:
+
+	Introduction
+	Supported Platforms
+	Installing
+	Configuration
+	Running
+	Customisation
+        Documentation   
+	Mailing Lists
+	Reporting Bugs
+	License  (GPL)
+	Alternative Solutions
+	Thanks
+        Comments / Suggestions / Patches?
+
+	Recent Changes
+
+
+Introduction
+------------
+
+  This server attempts to provide an attractive interface to browsing
+ and streaming a large MP3 or OGG collection via your web browser.
+
+  It allows MP3's and OGG Vorbis files to be served to any media player
+ which supports audio streaming.  Supported players include XMMS, FreeAmp
+ and WinAmp.
+
+  In addition to this support is also present for streaming MPEG video
+ files direct to clients.
+
+
+--
+ NOTE: The streaming of movies requires a  player capable of supporting
+        HTTP downloads.
+-
+
+
+  The streaming is very versatile; individual files may be played directly,
+ whole directory trees can be streamed, you may even choose to listen to
+ audio files which match a particular pattern.
+
+  The display of files is built up in real-time; which means that
+ you don't need to restart the server when adding music to your
+ collection.  Although as an optimization song tag details are only refreshed
+ when a supplied indexing script runs.
+
+
+Supported Platforms
+-------------------
+
+  This software was primarily developed under Debian GNU/Linux, and 
+ should run on any similar GNU/Linux development platform.
+
+  Because the software is written with the portable scripting
+ language, Perl, it should also run under other flavours of Unix.
+
+  GNUMP3d has been tested upon the following platforms:
+
+	GNU/Linux	FreeBSD		OpenBSD
+	NetBSD		Solaris		
+
+	Microsoft Windows(*)
+
+ 
+   --
+  (*) Using the most current version of the ActiveState Perl distribution only.
+
+
+
+Installing under Unix
+---------------------
+
+  From the unpacked archive simply run 'make install'.
+
+  The software can also be purged by running 'make uninstall' - if you have
+ the original unpackaged archive.
+
+  After installing the software you may well want to run the test scripts,
+ you can do this by simply running 'make test'.  Any failures at this
+ point are bugs - and should certainly be reported as such.
+
+
+
+Configuration
+-------------
+
+  When the server starts it looks for the global configuration file,
+ which defaults to /etc/gnump3d/gnump3d.conf - you may instead copy
+ this file to your home directory, as '.gnump3drc' in which case 
+ the personal configuration file will override the system wide one.
+
+  You may supply the location of an alternative configuration file
+ via the '--config' command line option.
+
+NOTE:
+
+  You will definitely need to edit the config file prior to running
+ the server for the first time.
+
+
+Running
+-------
+
+  The first time you start the server you should make sure you
+ have a current "index" of your music.  To generate an index 
+ please run the script 'gnump3d-index' after updating your
+ configuration file as discussed above.
+
+  Once you have an index you should run the main script, 'gnump3d'
+ to start the streaming server.
+
+  Once the server is started point a web browser at the host and
+ port which you have specified, and browse/stream away.
+
+  After you have verified that the server works you may wish to
+ run it in the background.  To do this create a startup script 
+ for your platform and mail it to me - if there isn't one included
+ in 'rcfiles/'
+
+
+Customisation
+-------------
+
+  The appearance of the server may be changed by switching to a new
+ theme.  The themes may be browsed and selected from the HTML pages
+ which are generated - if you wish to change the default theme please
+ see the configuration variable 'theme' in gnump3d.conf for details.
+
+  You may freely modify the theme files themselves, or create a new 
+ theme to change the appearance of the server.
+  
+  (Theme files are stored in a directory with the name of the theme in 
+ the /usr/share/gnump3d/ directory).
+
+
+Documentation
+-------------
+
+  The documentation included with this software includes several
+ 'man pages' which are installed along with the software, those
+ along with this document, and the project's website should contain
+ all the information you need to run the software.
+
+   The man pages should be installed when you install the software, 
+ if you need help on something try the following commands:
+
+	man gnump3d
+	man gnump3d.conf
+	man gnump3d-top
+
+
+
+Mailing Lists
+-------------
+
+  There are two mailing lists which you can turn to if you'd like
+ help, assistance, or discussion on this software.
+
+  Full details of these are given on the project's website, at
+ the following URL:
+
+        http://www.gnump3d.org/lists.html
+
+  NOTE: You must be subscribed to the mailing lists in order to
+ post messages.  This is a regretable position made necessary by
+ the amount of spam an open mailing list would receive.
+
+
+Reporting Bugs
+--------------
+
+  For a bug report to be useful it needs to contain as
+ much information as possible.
+
+  A simple means of giving all the relevant information is
+ to use the integrated bug reporting plugin.  (Obviously you
+ can't use this if the bug you wish to report concerns
+ plugins ;).
+ 
+  To use the bug reporting plugin simply point your web browser
+ at:
+ 
+ 	http://server:port/bug/
+	
+  Enter the text of your report into the text area, and click
+ on the submit button.
+  
+  If you're not using the bug reporting plugin simply send
+ me an email.  To assure prompt attention please include the
+ following information:
+
+   1. Your operating system, and version:
+	Run 'uname -a', and 'arch' and send me the results.
+
+   2. The version of GNUMP3d you're using.
+	Run 'gnump3d --version' and send me the results.
+
+   2a. The output of 'gnump3d --dump-plugins' if you're having
+      problems with the plugin support.
+
+   3. The browser/client/MP3 player you're using.
+
+  If you can send a patch that would be great; if not the more
+ detailed your report is the better.
+
+
+License
+-------
+
+  As the name might suggest, this software is distributed under 
+ the terms of the GNU Public License, version 2.
+
+  Please find a copy of the GNU Public License included with the
+ source archive in the file COPYING, it will also be accessible
+ from the server itself; read the startup banner for details.
+
+
+Alternative Solutions
+---------------------
+
+  Here's a brief list of alternative solutions which
+ you may want to investigate if this software doesn't
+ quite meet your needs.
+
+
+   Edna - http://edna.sourceforge.net/
+
+    This is very similar to this application, in fact this server
+   was initially modelled after Edna.
+
+    Edna lacks searching facilities, tag display for OGG files, and
+   is written in Python.
+
+
+	
+   Ample - http://ample.sourceforge.net/
+
+    This is a simple server which is comparable to Shoutcast.
+
+
+
+   KPlaylist - http://www.kplaylist.net/
+
+    This is a PHP-based solution which allows you to add individual
+   files to your playlist via your web browser then play it.
+    KPlaylist requires a database backend.
+
+
+Thanks
+------
+
+  I'm indebted towards many people who sent me bugfixes, corrections,
+ interesting questions and suggestions.
+
+  It is with their help that this software is what it is today, and I
+ can't thank them highly enough.  Any remaining bugs are of course 
+ entirely my fault.
+
+
+Comments / Suggestions / Patches?
+---------------------------------
+
+  I optimistically welcome comments, feedback, suggestions, updated
+ documentation and contributed themes/logos.
+
+  If you really like the software consider purchasing something from
+ the wishlist you'll find displayed at http://www.gnump3d.org/
+
+
+
+Steve
+---
+<steve@steve.org.uk>

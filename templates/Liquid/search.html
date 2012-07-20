@@ -1,0 +1,60 @@
+<!-- include="header.tmpl" -->
+
+<td class=mainTabOff align=center><a tabindex=-1 href=/>music</a></td>
+<td class=mainTabOff align=center><a tabindex=-1 href=/tagbrowse>tagbrowse</a></td>
+<td class=mainTabOff align=center><a tabindex=-1 href=/playlist>playlist</a></td>
+<td class=mainTabOff align=center><a tabindex=-1 href=/random>random</a></td>
+<td class=mainTabOff align=center><a tabindex=-1 href=/prefs>prefs</a></td>
+<td class=mainTabOn5 align=center><a tabindex=-1 href=/search/>search</a></td>
+<td class=mainTabOff align=center><a tabindex=-1 href=/stats>stats</a></td>
+
+</tr></table>
+<table border=0 cellpadding=0 cellspacing=0 width=100% height=21><tr>
+<td class=subTabOff5>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+
+<td class=subTabOff5><table align=center border=0 cellpadding=0 cellspacing=0 height=21><tr><td></td>
+</tr></table></td>
+<td class=subTabOff5>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+</tr></table>
+</td></tr>
+</tr>
+<br>
+
+<form action="/search/" method="get">
+<center>
+<table border=0 align=center cellspacing=0 cellpadding=4 class=boxedBox>
+<tr>
+	<td class=boxedHead>Search</td>
+</tr>
+<tr>
+	<td class=boxedMessage>
+		<table border="0" cellpadding="0" cellspacing="0" width="100%" summary="search archive">
+		<tr><td colspan="2" align="center"><b>Search Archive For Music</b></td></tr>
+		<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+		<tr><td align="right">Search any field:</td><td align="left"><input type="text" name="q" size="40" /></td></tr>
+		<tr><td align="right">Search for:</td><td align="left">
+		<input type="radio" name="type" value="all" checked /> All Terms
+		<input type="radio" name="type" value="any" /> Any Terms
+		</td></tr>
+		<tr><td align="right">Search artist:</td><td align="left"><input type="text" name="artist" size="40" /></td></tr>
+		<tr><td align="right">Search album:</td><td align="left"><input type="text" name="album" size="40" /></td></tr>
+		<tr><td align="right">Search song:</td><td align="left"><input type="text" name="title" size="40" /></td></tr>
+		<tr><td align="right">Search year:</td><td align="left"><input type="text" name="year" size="40" /></td></tr>
+		<tr><td align="right">Start Directory:</td><td align="left">$SELECT_COMBO</td></tr>
+		<tr><td align="right">Limit to genre:</td><td align="left">$GENRE_COMBO</td></tr>
+		<tr><td align="right">Play Results:</td><td align="left">
+		<input type="radio" name="play" value="0" checked /> No
+		<input type="radio" name="play" value="1" /> Yes
+		</td></tr>
+		<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+		<tr><td>&nbsp;</td><td><input type="submit" /></td></tr>
+		<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+		</table>
+	</td>
+</tr>
+</table>
+</center>
+</form>
+<p>&nbsp;</p>
+
+<!-- include="footer.tmpl" -->

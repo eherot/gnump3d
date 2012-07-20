@@ -1,0 +1,629 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+  gnump3d-index - Create a database of all tag information for audio files.
+
+=head1 SYNOPSIS
+
+  gnump3d-index [help options] [debugging options] [global options]
+
+  Help Options:
+    --manual           Show the manual.
+    --help             Show this help.
+    --version          Show the version number.
+
+  Debugging Options:
+    --verbose          Display all the tag values read.
+    --debug            Show the files indexed.
+
+  Global Options:
+    --config file      Set the GNUMP3d config file.
+    --output file      Write the output to the given file.
+    --root directory   Start the indexing at the given directory.
+    --stats            Don't update the cache file, just display audio stats.
+
+=cut
+
+
+=head1 DESCRIPTION
+
+
+  gnump3d-index is a simple script to index the tag information located
+ within the audio files of your archive.
+
+  The script will index the files found beneath your root, as defined
+ in the gnump3d.conf file - and write out a cache for speedy access.
+
+=cut
+
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--config>
+Set the GNUMP3d configuration file to read.
+
+=item B<--debug>
+Show the filenames of each file which is indexed.
+
+=item B<--help>
+Show a brief help overview.
+
+=item B<--manual>
+Show the manual to the user.
+
+=item B<--output>
+Write the tag cache to the given fil.
+
+=item B<--root>
+Start the indexing at the given directory, this overrided anything given in the configuration file passed to the program.
+
+=item B<--stats>
+Don't update the cache file, just display audio stats and exit.
+
+=item B<--verbose>
+Display all the tag values read from each indexed track.
+
+=item B<--version>
+Show the version number of this script, and exit..
+
+=item B<--dir>
+Specify the output directory where images were previously saved.
+
+=back
+
+=cut
+
+=head1 AUTHOR
+
+
+ Steve
+ --
+ http://www.steve.org.uk/
+
+ $Id: gnump3d-index,v 1.27 2006/04/25 16:50:56 skx Exp $
+
+=cut
+
+=head1 CONTRIBUTORS
+
+  Contributors to this code:
+
+=over 8
+
+=item  Gordon Haverland <perl@materialisations.com> 2003/11/11
+
+=back
+
+
+
+=head1 LICENSE
+
+Copyright (c) 2005 by Steve Kemp.  All rights reserved.
+
+This module is free software;
+you can redistribute it and/or modify it under
+the same terms as Perl itself.
+The LICENSE file contains the full text of the license.
+
+=cut
+
+use strict;
+
+#
+#  Standard Perl modules.
+#
+use File::Find;
+use Getopt::Long;
+use Pod::Usage;
+
+#
+# GNUMPd modules.
+#
+use gnump3d::config;
+use gnump3d::files;
+use gnump3d::filetypes;
+use gnump3d::readtags;
+
+
+# Version identifier for this script.
+my $VERSION_NUMBER = '$Revision: 1.27 $';
+
+#
+#  Options set by the command line arguments.
+#
+my %CONFIG;
+
+#
+#  Global file-type tester
+#
+my $tester = gnump3d::filetypes->new();
+
+
+#
+# Determine which configuration file to read.
+#
+if ( ( $ENV{"HOME"} ) &&
+     ( -e $ENV{"HOME"} . "/.gnump3drc" ) )
+{
+    $CONFIG{'file'} = $ENV{"HOME"} . "/.gnump3drc";
+}
+elsif ( -e "/etc/gnump3d/gnump3d.conf" )
+{
+    $CONFIG{'file'} =  "/etc/gnump3d/gnump3d.conf";
+}
+elsif ( -e "gnump3d.conf" )
+{
+    # This is mainly here for Windows users.
+    $CONFIG{'file'} = "gnump3d.conf";
+}
+
+
+#
+# Global variables.
+#
+my $cache    = "" ;
+my %cache;
+
+my @FOUND = ( );  # An array to hold filenames of audio files we locate.
+
+
+#
+# Initialize ourselves from the configuration file.
+#
+readConfig( $CONFIG{'file'} );
+
+
+#
+#  Parse the command line arguments.
+#
+parseArguments();
+
+
+#
+#  Make sure that we can read a configuration file.
+#
+if ( ! -e $CONFIG{'file'} )
+{
+    print "The configuration file which I've tried to read doesn't exist:\n";
+    print "'" . $CONFIG{'file'} . "'\n";
+    print "Aborting.\n";
+    exit;
+}
+
+
+
+#
+# Read various options from the configuration file - unless they have been
+# specified upon the command line.
+#
+if ( !$CONFIG{'root'} || length( $CONFIG{'root'} ) )
+{
+    $CONFIG{'root'} = getConfig( "root", "/home/mp3" ); 
+}
+if ( !length( $cache ) )
+{
+    $cache = getConfig( "tag_cache", "" );
+}
+
+
+#
+#  If we're to show statistics just do that and exit.
+#
+if ( $CONFIG{'stats'} )
+{
+    showStats( $cache );
+    exit;
+}
+
+
+
+#
+# Sanity check the code.
+#
+if ( ! -e $CONFIG{'root'} )
+{
+    print "The server root directory you are trying to index doesn't exist:\n";
+    print "'" . $CONFIG{'root'} . "'\n";
+    print "Aborting\n";
+    exit;
+}
+
+
+# Read in existing cache here, if present.
+readCache( $cache ) if( -e $cache );
+
+# And the update file, if present.
+readCache( "$cache.updates" ) if( -e "$cache.updates" );
+
+#
+# Do the indexing - following symlinks on non-Windows platforms.
+# 
+if ( &isWindows() )
+{
+  find({ wanted => \&findAudio }, $CONFIG{'root'} );
+}
+else
+{
+  find({ wanted => \&findAudio, follow => 1 }, $CONFIG{'root'} );
+}
+
+
+#
+# Process the list of found files.
+#
+&indexFiles( );
+
+#
+# Remove the updates file if present.
+#
+unlink("$cache.updates") if( -e "$cache.updates" );
+
+#
+# Finished
+exit;
+
+
+
+#
+#  Use the excellent File::Find module to locate all the files beneath
+# our archive root.
+#
+sub findAudio
+{
+    my ( $file ) = $File::Find::name;
+
+    if ( $CONFIG{'debug'} )
+    {
+      print $file . "\n";
+    }
+
+    return if ( ! $tester->isAudio( $file ) );
+    return if ( -z $file );
+
+    push @FOUND, $file;
+}
+
+
+#
+#  Show the number of files we have indexed, their total size, and
+# the total playlength.
+#
+sub showStats
+{
+    my ( $file ) = (@_);
+    my $COUNT = 0;
+    my $SIZE  = 0;
+    my $TIME  = "0";
+    
+    my %DETAILS = ( );
+
+    if ( ! -e $file )
+    {
+	print "Stats could not be displayed as the cache file doesnt exist";
+	print "The cache file we expect is $file\n";
+	exit;
+    }
+
+    open( FILY, "<$file" );
+
+    foreach (<FILY>)
+    {
+	chomp;
+	my @NAMES = split( /\t/, $_);
+
+	my $file = shift(@NAMES);
+	$DETAILS{$file} = \@NAMES;
+    }
+    close( FILY );
+
+    #
+    #  Process the hash.
+    #    Add up song times.
+    #    Add up total song size.
+    #
+    foreach my $file ( keys %DETAILS )
+    {
+	my $details = $DETAILS{$file};
+	
+	# A new line == A new file in archive.
+	$COUNT ++;
+	
+	foreach my $pair ( @$details )
+	{
+	    if ( ( $pair =~ /([A-Z]+)=(.*)/ ) &&
+		 ( length( $2 ) ) )
+	    {
+		my $key = $1;
+		my $val = $2;
+		
+		if ( $key eq "SIZE" )
+		{
+		    $SIZE += $val;
+		}
+		if ( $key eq "LENGTH" )
+		{
+		    if ( $val =~ /([0-9]+):([0-9]+):([0-9]+)/ )
+		    {
+			$TIME += $3 + ($2 * 60 ) + ($1 * 60 * 60 );
+		    }
+		    elsif( $val =~ /([0-9]+):([0-9]+)/ )
+		    {
+			$TIME += $2 + ($1 * 60 ) 
+		    }
+		}
+	    }
+	}
+    }
+    
+    #
+    #  Fudge the size
+    my $sizeTotal = $SIZE;
+    $sizeTotal = $sizeTotal < (1024)      ?
+      $sizeTotal . " bytes" : (
+			       $sizeTotal < (1024 ** 2) ? 
+			       (int (10 * $sizeTotal/1024)/10) . "K" : (
+									$sizeTotal < (1024 ** 3) ? 
+									(int (10 * $sizeTotal/(1024 ** 2) )/10) . "Mb" :
+									((int (10 * $sizeTotal/(1024 ** 3) )/10) . "Gb")));
+    
+
+    #
+    #  Fudge the time.
+    #
+    my $foo = "";
+    
+    $foo .= int($TIME/(24*60*60)) . " days, ";
+    $foo .= ($TIME/(60*60))%24    . " hours, ";
+    $foo .= ($TIME/60)%60         . " mins ";
+    $foo .= $TIME%60              . " seconds";
+    
+    $TIME = $foo;
+
+
+    #
+    #  Print the results
+    #
+    print <<E_O_INFO;
+Total number of songs: $COUNT
+Total size of archive: $sizeTotal ($SIZE bytes)
+Total playlength     : $TIME
+E_O_INFO
+
+}
+
+
+#
+#  Read in the tag files of our found files, and write out their values.
+#
+sub indexFiles
+{
+    my $count = 0;
+    my $total = $#FOUND + 1;
+
+    my $error = 0;
+    open ( OUT, ">$cache" ) or $error = 1;
+    if ( $error )
+    {
+	print "Error opening the cache file '$cache' - $!\n";
+	exit;
+    }
+
+    foreach my $file ( sort @FOUND )
+    {
+	# Update our progress count every ten tracks.
+	if ( ( ( $count % 10 ) == 0 ) && $CONFIG{'verbose'} )
+	{
+	    my $PER = ( ( $total - $count  ) / $total ) * 100.0;
+	    if ( $PER =~ /([0-9]+)\.([0-9]+)/ )
+	    {
+		$PER = $1;
+	    }
+	    
+	    print "Indexed $count entries of $total - (\%$PER remaining)\n";
+	}
+
+        # If we looked for an old cache file, and it existed, we can now
+        # look to see if the mtime in the cache is the same as the mtime
+        # of the file.  If they are the same, trust the cache.
+	my $skip = 0;
+	
+	# Is $file a symlink, or a "file"?
+	my @fstat;
+	if( -l $file ) 
+	{  
+	    # $file is a link
+	    @fstat = lstat( $file ) 
+	}
+	else 
+	{
+	    @fstat = stat( $file );
+	}
+	
+	if ($#fstat < 0)
+	{
+	    print "ERROR stat()ing $file\n";
+	}
+	next if ($fstat[7] < 1); # skip file if it's 0 bytes.
+
+	if ( ( exists( $cache{$file} ) ) &&
+	     ( exists( $cache{$file}->{"MTIME"} ) ) &&
+	     ( defined( $fstat[9] ) ) &&
+	     ( $cache{$file}->{"MTIME"} == $fstat[9] ) )
+	{
+	    $skip = 1;
+	}
+
+	unless( $skip ) 
+	{
+	    # Holder for the tags within the files.
+	    my %TAGS = &main::getTags($file);
+	    
+	    #
+	    #  Show the tags we've found if the user wanted to see
+	    # debugging output.
+	    #
+	    if ( $CONFIG{'debug'} )
+	    {
+		print $file . "\n";
+		foreach my $k ( keys %TAGS )
+		{
+		    print "\t$k\t" . $TAGS{ $k } . "\n";
+		}
+	    }
+
+	    #
+	    # Write the filename and tag details to the cache file, as
+	    # tab seperated values.
+	    #
+	    print OUT "$file";
+
+	    foreach my $k ( keys %TAGS )
+	    {
+		my $value = $TAGS{ $k };
+
+		# Replace tabs in tag values with spaces so that the reading
+		# code doesn't get confused by excessive deliminators. 
+		# 
+		$value =~ s/\t/     /g;
+
+		#
+		#  Newlines in the tag values will cause us problems.  
+		# Strip them.
+		#
+		$value =~ s/\n//g;
+		$value =~ s/\r//g;
+		
+		print OUT "\t" . $k . "=" . $value;
+	    }
+	    print OUT "\n";
+
+	}
+	else 
+	{ 
+	    # We have a previously cached entry to write.
+	    print OUT "$file";
+
+	    foreach my $k ( keys %{$cache{$file}} )
+	    {
+		my $value = defined( $cache{$file}->{ $k } ) ?
+		  $cache{$file}->{ $k }            : '';
+
+		print OUT "\t" . $k . "=";
+		if( length( $value ) > 0 ) 
+		{
+		    $value =~ s/\t/     /g;
+		    $value =~ s/\n//g;
+		    $value =~ s/\r//g;
+
+		    print OUT $value;
+		}
+	    }
+	    print OUT "\n";
+	}
+
+
+	# Update our processed count.
+	$count += 1;
+    }
+
+    #
+    # Close the output file.
+    close( OUT );
+}
+
+
+
+#
+#  Parse the command line options.
+#
+sub parseArguments
+{
+    my $HELP	= 0;
+    my $MANUAL	= 0;
+    my $VERSION	= 0;
+
+    GetOptions(
+	       #
+	       # Help options.
+	       #
+               "help",       \$HELP,
+               "version",    \$VERSION,
+	       "manual",     \$MANUAL,
+
+	       #
+	       # Debug options
+	       #
+	       "debug",      \$CONFIG{'debug'},
+	       "verbose",    \$CONFIG{'verbose'},
+
+	       #
+	       # General options
+	       #
+	       "config=s",   \$CONFIG{'file'},
+	       "output=s",   \$cache,
+	       "root=s",     \$CONFIG{'root'},
+	       "stats",      \$CONFIG{'stats'},
+               );
+
+    pod2usage(1) if $HELP;
+    pod2usage(-verbose => 2 ) if $MANUAL;
+
+
+    if ( $VERSION )
+    {
+	my $REVISION      = '$Revision: 1.27 $';
+
+	if ( $REVISION =~ /1.([0-9.]+) / )
+	{
+	    $REVISION = $1;
+	}
+
+	print "gnump3d-index $REVISION\n";
+	exit;
+
+    }
+}
+
+
+#
+# GH: subroutine to read the cache.
+#
+sub readCache 
+{
+    my $fname = shift;
+
+    # Cache is 1 line per entry as /absolute/pathname\tKEY=VALUE...
+    open( CACHE, "< $fname" ) || die "Can't open cache ($fname) for read. $!\n";
+    while( my $line = <CACHE> ) 
+    {
+	chomp( $line );
+
+	my @fields   = split( /\t/, $line );
+	my $pathname = shift( @fields );
+	if( exists( $cache{$pathname} ) ) 
+	{
+	    print "Error: duplicate entries for ($pathname)\n";
+	}
+
+	my $entry = {};
+	foreach my $field (@fields) 
+	{
+	    my($key,$value,@junk) = split(/=/, $field);
+	    $key = 'MTIME' if ($key eq 'mtime');
+
+	    # Use empty string for undef.
+	    $value = defined( $value ) ? $value : '';
+
+	    #      print "Junk in field ($field)\n" if( @junk );
+	    $entry->{$key} = $value;
+	}
+	
+	$cache{$pathname} = $entry;
+    }
+    close( CACHE );
+}
+
+

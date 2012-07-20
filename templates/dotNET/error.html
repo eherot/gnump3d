@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "DTD/xhtml11-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+$META
+ <title>GNUMP3d [ $HOSTNAME : $DIRECTORY ]</title>
+ <style type="text/css">
+   body {font-family: arial, sans-serif; color: black; background-color: gray;}
+   td.title {color: gray; font-weight:bold; height:30px}
+
+   :link { color : #808;  }
+   :visited { color: #800; text-decoration: none; }
+
+   a.top:visited {color: #800; font-weight: bold; text-decoration: none; }
+   a.top:link {color: #A00; font-weight: bold; text-decoration: none; }
+  </style>
+</head>
+
+<body bgcolor="white">
+
+<!-- header -->
+ <form action="/search" method="get">
+ <table width="100%" bgcolor="silver" border="0" cellpadding="2">
+  <tr><td align="left" width="50%" valign="top">
+  <a class="top" href="http://www.gnump3d.org">GNUMP3d</a> server on $HOSTNAME
+  <p>  
+  <strong>Music Search :</strong>
+    <input type="text" name="q" />
+  </td>
+  <td valign="top">
+<a class="top" href="/" title="Got to the root of your music archive.">Home</a><br>
+<a class="top" href="/playlist/" title="Selectively stream different directories.">Custom Playlists</a><br>
+<a class="top" href="/stats/" title="See the most popular songs on this server.">Most Popular</a><br>
+  </td>
+  <td valign="top">
+<a class="top" href="/recent/" title="See the most recent tracks played">Most Recent</a><br>
+<a class="top" href="/search/" title="Search the archive for music">Search</a><br>
+<a class="top" href="/prefs/" title="Change your preferences">Preferences</a><br>
+  </td>
+  </tr>
+ </table>
+ </form>
+
+
+<!-- Banner -->
+
+
+<p align="center">
+$BANNER
+</p>
+
+
+<table border="0" cellpadding="2" cellspacing="0" width="100%" bgcolor="#eaecef">
+<tr><td class="title" colspan="7">Error</td></tr>
+<tr><td>
+$ERROR_MESSAGE
+</td></tr>
+</table>
+
+
+<p>&nbsp;</p>
+
+<p align="center">
+$BANNER
+</p>
+
+<p align="center">
+[ <a href="http://www.gnump3d.org/">GNUMP3d</a> | 
+<a href="http://www.gnump3d.org/FAQ.html" title="View this software's Frequently Asked Questions - with answers!">FAQ</a>
+]
+</p>
+
+
+</body>
+</html>
+

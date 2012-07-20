@@ -1,0 +1,259 @@
+<!--  This file was originally taken from Paul Crowleys
+     homepage, and is included here with consent. 
+
+      The original location was:
+
+	 http://www.ciphergoth.org/ciphergoth.css 
+
+      His site is a good read for people who like
+    Cryptography, and many other fine things, check it
+    out at:
+
+	 http://www.ciphergoth.org/
+
+ -->
+
+body {
+  background: white;
+  color: black;
+  margin-left: 3%;
+  margin-right: 3%; 
+}
+
+body.gl-index {
+  background: black;
+  color: white;
+  font-family: sans-serif;  
+}
+
+:link { color : #E00 }
+:visited { color: #800 }
+
+a:hover { background: #FFE }
+a:active { color: black; background: #FFC }
+
+.navt, .navb { 
+  background: #FEE; 
+  padding: 0.2ex 1em 0.6ex 1em;
+}
+
+.navt {
+  border-top: medium solid #800;
+}
+
+.navb {
+  border-bottom: medium solid #800;
+}
+
+.bigtitle {
+  background: black;
+  padding: 0.5ex 5% 0.5ex 5%;
+}
+
+.bigtitle h1 {
+  color: white;
+}
+
+.box, .abstract {
+  border-left: thin solid #008;
+  border-right: thin solid #008;
+  border-top: medium solid #008;
+  border-bottom: medium solid #008;
+}
+
+.box {
+  background: #EEF;
+  color: black;
+  padding: 1ex 5% 1ex 5%;
+}
+
+dt {
+  margin-top: 1ex;
+  font-weight: bold;
+}
+
+dl.strongdt dt {
+  font-family: sans-serif; 
+  font-size: larger;
+}
+
+h1 {
+  text-align: center; 
+}
+
+h1, h2, h3, h4 {
+  font-family: sans-serif;
+  color: #008
+}
+
+.authors { text-align: center }
+
+.cite, .abstract {
+  margin-left: 15%;
+  margin-right: 15%;
+}
+
+.cite {
+  font-size: smaller;
+}
+
+.abstract {
+  text-align: justify;
+  padding: 2ex 1.5em 2ex 1.5em ;
+}
+
+table.twocolumn tr td { vertical-align: top; width: 50% }
+
+
+/* ============================================== */
+
+body.gl {
+  background: black;
+  color: white;
+}
+
+body.gl h1 {
+  color: white;
+}
+
+body.gl :link { color : #EEE }
+body.gl :visited { color: #999 }
+body.gl :hover { background: inherit }
+body.gl :active { color: #FFF }
+
+body.gl .navt, body.gl .navb {
+    background: black;
+    border-top: thin solid white;
+    border-bottom: thin solid white;
+}
+
+table.gl-main {
+  margin-top: 5ex;
+  margin-bottom: 5ex;
+}
+
+table.gl-main, table.gl-navbuttons, table.gl-index {
+  font-weight: bold;  
+}
+
+table.gl-main, table.gl-navbuttons, table.gl-index, td.gl-button table {
+  font-weight: bold;  
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.postinfo {
+  background: #EEF;
+}
+
+.keywords {
+  font-size: smaller;
+  font-weight: bold;
+}
+
+body {margin: 0;
+padding: 0;
+background: #CACCB4;
+font: 1em/1.7em arial, sans-serif; }
+
+pre {text-indent: 30px;}
+
+
+#content {background: #CACCB4;
+font: 0.8em "Trebuchet MS", arial, sans-serif;
+height: auto;
+text-align: justify;
+padding: 100px 70px 0px 70px;
+z-index: 0;}
+
+#content a {text-decoration: none;
+color: #86862D;}
+
+#content a:hover {background: #ADC09F;}
+#banner {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height:50px;
+	width: 100%;
+	padding: 0;
+	margin: 0 1px;
+	border: 3px solid #808040;
+	border-bottom-color:#606030;
+	border-right-width:0px;
+	border-left-width:0px;
+	border-top-width:0px;
+	color: #505025;
+	background: #ABAD85;
+	z-index: 5;
+}
+body>#banner {position: fixed;}
+
+#banner h1 {margin: 0;
+padding: 5px;}
+
+#tabmenu {color: #000;
+position: absolute;
+top: 49;
+padding: 0px;
+z-index: 10;
+margin-left: 9px;}
+body>#tabmenu {position: fixed; top: 31px;}
+head:first-child+body #tabmenu {top: 33px;} /*only mozilla*/
+
+#tabmenu li {display: inline;
+overflow: hidden;
+list-style-type: none;}
+
+#tabmenu a, a.active {
+	color: #BABA99;
+	background: #898B5E;
+	font-size: 0.8em;
+	font-weight: bold;
+	border: 2px solid #606030;
+	border-top-width:1px;
+	border-top-color:#747440;
+	border-bottom-color:#606030;
+	border-right-color:#606030;
+	border-left-color:#a0a060;
+	padding: 2px;
+	margin: 2px;
+	text-decoration: none;
+}
+
+#tabmenu a.active {
+	color: #DEDECF;
+	background: #ABAD85;
+	border-top: 3px solid #ABAD85; z-index: 30;
+	border-top-width:4px;
+	border-top-color:#ABAD85;
+	border-bottom-color:#808040;
+	border-right-color:#808040;
+	border-left-color:#d0d080;
+}
+
+#content tr:hover {background: #ADC09F;}
+
+/*#tabmenu a:visited {color: #E8E9BE;}*/
+
+#tabmenu a.active:hover {
+	background: #ABAD85;
+}
+#tabmenu a:hover {
+	color: #DDFFAA;
+}
+.mainlist{
+	border: 4px solid #ABAD85;
+	border-bottom-color:#DEDECF;
+	border-top-color:#ABAD85;
+	border-left-color:#ABAD85;
+	border-right-color:#DEDECF;
+}
+.mainlistinner{
+	border: 1px solid #ABAD85;
+	border-top-color:#808040;
+	border-left-color:#606030;
+	border-bottom-color:#ABAD85;
+	border-right-color:#ABAD85;
+}

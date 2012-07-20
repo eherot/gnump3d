@@ -1,0 +1,33 @@
+#
+#  This file is processed to produce 'gnump3d.conf.win', it
+# contains just the keys and values which differ from a standard
+# Unix setup.
+#
+#  I've chosen to do it this way so that comments never get out
+# of sync.
+#
+#  This step is performed as part of the 'make dist' command I use
+# to build a release, see the script ../bin/generate-win-conf
+# for all the gory details.
+#
+# Steve
+# --
+
+root               = C:/mp3
+logfile            = C:/gnump3d2/logs/access.log
+errorlog           = C:/gnump3d2/logs/error.log
+stats_program      = C:\gnump3d2\bin\gnump3d-top.bat
+index_program      = C:\gnump3d2\bin\gnump3d-index.bat
+template_directory = C:/gnump3d2/templates
+theme_directory    = C:/gnump3d2/templates
+theme_dir          = c:\gnump3d2\templates
+plugin_directory   = C:/gnump3d2/lib/gnump3d/plugins
+mime_file          = C:/gnump3d2/etc/mime.types
+file_types         = C:/gnump3d2/etc/file.types
+now_playing_dir    = C:/gnump3d2/logs/serving
+tag_cache          = C:/gnump3d2/logs/tag.cache
+lockfile           = C:/gnump3d2/lock.tmp
+plugin_directory   = C:/gnump3d2/lib/gnump3d/plugins
+now_playing_path   = c:\gnump3d2\logs\serving
+tag_cache          = C:/gnump3d2/logs/tag.cache
+

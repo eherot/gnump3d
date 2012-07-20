@@ -1,0 +1,1107 @@
+	
+
+  CHANGELOG - GNUMP3d
+
+	This is the Changelog for the GNU Audio Streamer, GNUMP3d.
+
+	As a brief summery:
+
+	v0.1     - v0.9.9.3   Were coded in C
+	v0.9.9.4 - v1.0       Were coded in C++
+	v1.0     - Current    Were coded in Perl
+
+
+  3.0 [ 17th October 2007]
+   - Removed several perl warnings.
+   - Removed password protection as being broken beyond repair.
+
+  2.9final [22nd April 2007]
+
+   - BUGFIX:  Movie links are non-broken in the output.
+   - DEVELOPMENT: HTTP Auth Digest Patch.
+	
+
+  2.9.9.1 [ 11th September 2006 ]
+
+   - BUGFIX:  file.types is installed.
+   - BUGFIX:  gnump3d-top works.
+
+  2.9.9 [ 2rd September 2006 ]
+
+
+   - LANGUAGES: New Basque translation.
+
+   - BUGFIX: Theme names may contain underscores.
+   - BUGFIX: Directories are sorted in playlist correctly.
+   - BUGFIX: Search plugin and quality are never sent as cookies.
+   - BUGFIX: "Now playing" identifies multiple connections from the same IP.
+
+   - CLEANUP: Better Ogg Vorbis Tag handling.
+   - CLEANUP: Suggest a filename for playlists.
+   - CLEANUP: Case-insensitive sorting in several places.
+   - CLEANUP: EXTINF formatting is improved.
+   - CLEANUP: Downsample cache files are less liable to suffer from collisions.
+
+   - PLUGINS: /info/ now shows playlist information too.
+   - PLUGINS:  Massively more flexiable, scalable, and sexy plugin system.
+     TODO - Finish!
+
+   - DEVELOPMENT:  A new collection of test cases.
+
+   - MISC:  Added a more current MIME file.
+   - MISC:  The filetypes we understand are now user-modifiable, via the
+	   file /etc/gnump3d/file.types
+
+
+  2.9.8 [ 17th November 2005 ]
+
+    - MISC: New Spanish translation of error texts & etc.
+    - MISC: Updated German translation of error texts & etc.
+
+    - THEMES: New theme Avalon, from Stan Mulder.
+
+    - BUGFIX: Random directory selection doesn't result in DOS with
+	          no tag cache file present.
+    - BUGFIX: Don't give warnings when sorting by track number.
+    - BUGFIX: /random/directory works on Windows machines too now :)
+
+    - SECURITY: Remove insecure usage of /tmp.    [CVE-2005-3349]
+    - SECURITY: Filter input parameters/cookies.  [CVE-2005-3355]
+
+
+  2.9.7 [ 28th October 2005 ]
+
+    - BUGFIX:  The previous release was broken.
+    - BUGFIX: Allow files to start with ...
+
+	
+  2.9.6 [ 28th October 2005 ]
+
+    - BUGFIX:  When "disable_tag_cache" is set don't spawn gnump3d-index.
+    - BUGFIX:  Still run `gnump3d-index` on startup if given --quiet.
+    - BUGFIX:  Playlist play-lengths are correctly displayed now.
+    - BUGFIX:  "/COPYING" link is now non-broken
+    - BUGFIX:  Process playlist files that share directory names.
+    - BUGFIX:  ".ram" files are playlist, not audio files.
+
+    - SECURITY: Remove XSS attacks.     [CVE-2005-3122]
+    - SECURITY: Prevent path traversal. [CVE-2005-3123]
+
+
+  2.9.5 [ 8th September 2005  ]
+
+    - BUGFIX:  Don't stat the file twice in the indexer.
+    - BUGFIX:  Have Info plugin handle non/newly-cached items.
+    - BUGFIX:  Escape filenames more.
+    - BUGFIX:  Allow the 'new_days' parameter to work properly.
+    - BUGFIX:  Strip newline characters from tag values.
+    - BUGFIX:  Filter user supplied input in 404 page. (XSS).
+    - BUGFIX:  MPEG4 tracknumber reading bugfix.
+    - BUGFIX:  Avoid warnings about 'sanitizePath'.
+
+    - CLEANUP: HTML Validation fixes for the playlist plugin.
+	
+    - THEMES:  New theme 'Liquid' from Daniel Eiland
+    - THEMES:  New theme 'BlueBox' from Aaron Brown
+
+    - MISC:    "Most recent" now shows the time of the songs played.
+    - MISC:    The "currently playing files" are cleaned up on Windows
+
+
+  2.9.4 [ 10th May 2005  ]
+
+    - FEATURES: Updated MP3::Info module to support newer tags.
+
+    - BUGFIX:   Fixed the broken /info/ links from the previous release.
+
+	- MISC:     Fixed typos on 'extra.html' pages.
+	- MISC:     Avoid warning due to depreciated use of split in custom playlist.
+
+
+  2.9.3 [ 1st April 2005 ]
+
+    - CACHING: Allow incremental tag cache updating.
+
+    - MISC:    Show new files instead of new directories.
+    - MISC:    Tag support for .WMA files.
+    - MISC:    Tag support for .MP4 / .AAC files.
+    - MISC:    Be paranoid about cookie values and parameter values.
+    - MISC:    Added French language translation.
+    - MISC:    Added a couple of new sorting options.
+
+    - THEMES:  Fix the broken link in the footer of the Nomad Theme.
+    - THEMES:  Add <body> tags to the LaFrere theme.
+    - THEMES:  Use JavaScript to focus the search forms on all search pages.
+
+    - BUGFIX:  URL Encode files on the random playlist page.
+    - BUGFIX:  Fix 'FILENAME' tag computation in the worker 
+               children; it was exposing filesystem layout.
+    - BUGFIX:  Tag cache reload should happen in the parent.
+
+
+  2.9.2 [19th Feb 2005]
+
+       - Identical to previous release, issued immediately afterwards
+	 due to screwup uploading to savannah.gnu.org
+
+
+
+  2.9.1 [ 19 Feb 2005 ]
+
+  	- FEATURES:  Support .aif/.aiff tag display and processing.
+	- FEATURES:  Show .shn files as audio files too.
+	- FEATURES:  Show all audio files in the statistics page.
+	
+	- BUGFIX:    Applied patch from Martin Lohmeier for broken tag handling.
+	- BUGFIX:    Quoting files is handled slightly better.
+
+	- PLUGINS:   Added a new link to serve a random directory's playlist.
+
+	- MISC:      Added '--debug' flag to gnump3d-top.
+	- MISC:      Added support for custom META tags to be added, to allow
+	             users to customize Content-type, etc.
+
+	- THEMES:    New theme from Jeff Smith
+	
+
+  2.9  [ 11th Jan 2005 ]
+
+	- BUGFIX: Avoid infinate loop when calling /random/ with empty cache file
+	- BUGFIX: Handling sorting of track numbers more intelligently.
+	- BUGFIX: Allow library files to install correctly on Mac OS X
+	- BUGFIX: Correct the rewriting of absolute pathnames in premade playlists
+
+	- MISC: Added --debug option go gnump3d-index
+	- MISC: Quote command line arguments more safely when invoking commands
+	- MISC: Allow meta information to persist even when downsampling.
+	- MISC: Don't print 'tag cache initialized' when starting.
+
+	- FEATURES: Allow recently modified directories to be flagged.
+                new config, new_format, new_days, and $NEW for directory_format
+	- FEATURES: Allow URL rewriting when behind a proxy server.
+
+	- THEMES: Added a new theme optimized for handheld devices.
+	- THEMES: Added new 'Club Nomad' theme.
+
+	- PLUGINS: Updated the handling of nested directorys in custom playlist
+	- PLUGINS: Updated playing of nested playlists. (esp. for Firefox
+	
+
+  2.8  [ 18 May 2004 ]
+	
+	- MISC: Added more comprehensive support for Microsoft Windows
+	- MISC: Don't output 'indexing complete' when running with '--quiet'
+	- MISC: mpc is a valid audio file type.
+	- MISC: Leave playlists which point to external sites alone.
+	- MISC: Test for password files all the way up to the root of the archive.
+	- MISC: Deal with the root directory containing a trailing '/'.
+	- MISC: Added explicit DOWNSAMPLING document.
+	- MISC: Highlight entire row in tabular theme.
+	- MISC: Updated version numbers
+    
+	- BUGFIX: Fix date used for logging to access log.
+	- BUGFIX: Abort with error if indexing program fails.
+	- BUGFIX: Don't hold server socket open in child processes,
+	          this fix allows logrotation to function correctly.
+	- BUGFIX: Fixed up playlists which were erroneoulsy empty
+	- BUGFIX: Downsampling treats its arguments case insensitively.
+
+	- PLUGINS: Allow the configuration file to set the default number
+ 	           of random songs generated via 'random.pm'.
+	- PLUGINS: Custom playlist verified working properly.
+	
+
+
+  2.7  [ 25th March 2004 ]
+
+    - MISC: New module 'sorter.pm'
+	- MISC: Removed module 'playlist.pm'
+	- MISC: Updated the Debian rcfile, to source /etc/default/gnump3d
+	- MISC: Fixed the display of version on the templates and startup.
+	- MISC: Available themes are sorted upon the preferences page.
+	- MISC: .wma is recognised as an audio file.
+	- MISC: .m4p is recognised as an audio file.
+	- MISC: Make sure each plugin is mentioned in each theme directory.
+	- MISC: Added startup script for Gentoo Linux.
+	- MISC: Allow caching of downsampled files.
+	- MISC: Report perl version on --help and --version output
+	- MISC: New module gnump3d::MD5
+
+	- FEATURES: Much improved installation system
+	- FEATURES: Sorting of playlists and track display are *identical*
+	- FEATURES: Enhanced logfile writing, the user may specify the format.
+	- FEATURES: Massive speedup of indexing via file modification date cache.
+	
+	- THEMES: Fixed to use the $RELEASE variable instead of hardcoding.
+	- THEMES: Corrected a couple of typos and HTML errors.
+	- THEMES: Fixed obsolete references to /last/
+	- THEMES: Font tweaking and cosmetics in default theme.
+	- THEMES: Added new 'SchwartzNGrau' theme by Pat Riehecky
+	- THEMES: Several minor cleanups.
+	- THEMES: dotNet cleanup.
+	- THEMES: Updated version numbers in static pages to 2.7
+	- THEMES: Removed `simple`
+
+    - BUGFIX: Don't escape the ':' character.  (Broke banners).
+    - BUGFIX: Allow downsampling commands to work case insensitively of
+	          filename suffix.
+    - BUGFIX: 'Random Selection' on the directory index links properly.
+	- BUGFIX: Added several new test scripts.
+	- BUGFIX: Advanced playlists contain the track lengths in seconds.
+	- BUGFIX: gnump3d-index has a valid shebang line.
+	- BUGFIX: Searching with no terms returns an error rather than all files.
+	- BUGFIX: Searching on genre fixed.
+	- BUGFIX: XHTML 1.0 output cleanups (default theme only).
+	- BUGFIX: Default preference is to show all file types, not hide them.
+	- BUGFIX: Don't offer to play the prefs panel
+	- BUGFIX: gnump3d-index '--root' argument works correctly.
+	- BUGFIX: Indexing ignores 0-byte files.
+	- BUGFIX: Document log_format, and remove mention of maximum_connections.
+	- BUGFIX: Quieten gnump3d2 debugging output.
+	- BUGFIX: Make sure the 'accept' call succeeds.
+	- BUGFIX: Committed fix from rpmohn for filenames with '.' in their names.
+	- BUGFIX: Persist downsample quality in pre-made playlists.
+	- BUGFIX: Ignore zero-byte sized files when indexing.
+
+	- PLUGINS: Preferences plugin shows installed languages.
+		(doesn't allow switching; wanna encourage more contributions)
+	- PLUGINS: Now possible to search on artist, album, or song title.
+	- PLUGINS: Browsing by categories such as artist, year, genre.
+
+
+
+  2.6  [ 16th October 2003  ]
+
+	  Moved to hosting at Savannah / gnu.org
+
+  	- CACHING:  Added patch from Solomon Peachy for improved tag
+	            caching.
+
+	- CLEANUP:  Remove gnump3d-index, and gnump3d-index.1 on uninstall
+	- CLEANUP:  Removed FreezeThaw.pm
+	- CLEANUP:  Changed the way the "currently playing" works.
+	
+	- BUXFIX: Escape song and directory names in the info plugin.
+	- BUGFIX: Chop out trailing '/' in banner section if necessary.
+	- BUGFIX: Plugin disabling works properly again.
+	- BUGFIX: gnump3d-index will work with symlink for the root directory
+	- BUGFIX: Sorting works again.
+	- BUGFIX: Movies are displayed correctly.
+	- BUGFIX: Advanced playlists work again - and are optional.
+	- BUGFIX: Switch GID before UID.
+	- BUGFIX: Initialise the tag index after running gnump3d-index,
+	          not before.
+	- BUGFIX: URL Encode form submission values in the random plugin.
+	- BUFFIX: Sort directories case insensitiviely.
+
+	- PLUGINS: The random plugin will includes "Random Directory".
+	- PLUGINS: Added new plugin '/size' to show the size of your archive.
+	- PLUGINS: Search plugin removes XSS attacks properly.
+
+	- THEMES: Added new theme 'Clean' based upon the layout of steve.org.uk
+
+	- LANGUAGES: The code is moving towards multilingual support now!
+
+	- MISC: Fix install permissions.	
+	- MISC: rewrote getlibdir to be much neater.
+	- MISC: gnump3d-index will now follow symbolic links correctly.	
+	- MISC: 'gnump3d-index --stats' will display more intersting stats.
+	- MISC: Changed the sample downsample lines for the OGG files.
+	- MISC: Most of the startup error messages now contain instructions
+	        on fixing the problem.
+	- MISC: .WMV is now marked as being a movie filetype.
+	- MISC: The 'Tabular' theme now has fixed menus.
+	- MISC: Make cookies persist "indefinately".	
+
+   Updates:
+	
+	- PLUGINS: The random plugin honours downsampling settings.
+	- PLUGINS: The currently playing plugin shows the times of tracks
+	- BUGFIX:  Escape the HTML banner section.
+	- BUGFIX:  Now playing works properly.
+
+
+  2.5b [ 2nd July 2003 ]
+	- CLEANUP: Don't duplicate commented lines in gnump3d.conf.win
+	- CLEANUP: Removed an annoying tracing message.
+	- CLEANUP: Added more links to the new Tabular Theme.
+
+	- PORTABILITY: Allow gnump3d-index program to be read from gnump3d.conf
+	- PORTABILITY: Run indexing script even on windows.
+
+	- PLUGINS: Show song tags for the custom playlist plugin.
+
+	- Added massive optimization for displaying directories with 
+	  large numbers of files inside them.
+	- Added the ability to ignore song tags via 'hide_song_tags = 1'
+
+
+  2.5 [ 29th June 2003 ] 
+  	- PORTABILITY: Generate gnump3d.conf.win as part of 'make dist'
+	- PORTABILITY: Added initial multilingual support.
+
+	- FEATURES: Added configuration option 'tag_cache'.
+	- FEATURES: Use FreezeThaw for the currently playing list.
+	- FEATURES: Added the ability to limit access to a specific referrer.
+	- FEATURES: Added tag indexer as seperate script.
+	- FEATURES: Highlight the matching search terms on the results page.
+	- FEATURES: Show the directory name in search results.
+	- FEATURES: More robust tag handling.
+
+	- DOWNSAMPLING: Added support for 'default_quality'.
+	- DOWNSAMPLING: Abort aborted connections properly.
+
+	- MISC: Removed bin/installer - looks like I'm never going to use it.
+	- MISC: Updated version numbers
+	- MISC: Convert root to using '/' characters upon Windows.
+	- MISC: Added support for .m4a files.
+	- MISC: Added 'profile' target to the Makefile.
+        - MISC: Spell checked all the README's and the configuration file.	
+	- MISC: Hide the 'lost+found' mountpoint directories.
+
+	- BUGFIX: Open the access log before dropping privileges.
+	- BUGFIX: Fix OGG Vorbis comment handling.
+	- BUGFIX: '/info' link works for movies too.
+	- BUGFIX: Space characters are encoded correctly to '%20' not '+' now.
+	- BUGFIX: gnump3d-top shows the most popular user agents properly.
+
+	- THEMES: Added the dotNET theme from MarquiS
+	- THEMES: Each plugin now uses a dedicated template file.
+	- THEMES: Taking advantage of the new flexibility - a new template:
+	          Tabular, using pure CSS to make tab menus.
+	- THEMES: Removed 'split' as it was ugly and hard to deal with.
+
+	- PLUGINS: The currently playing plugin works again.
+	- PLUGINS: The search function will works nicely.
+	- PLUGINS: Highlight the matching search terms on the results page.
+	- PLUGINS: Show the directory name in search results.
+	- PLUGINS: Added new 'random tracks' plugin
+	- PLUGINS: The currently playing works correctly again.
+
+  2.4 [ 2nd May 2003  ]
+	- BUGFIX: Make the logfile format really be Apache common format.
+	- BUGFIX: Give error when user-playlists are empty.
+	- BUGFIX: Correctly handle downsample commandlines.
+	          (quoting and inserting filename appropriately)
+	- BUGFIX: Sorting by track number works again.
+	- BUGFIX: Always retrieve bitrate and length of MP3s regardless of
+	          missing ID3 tags.
+	- BUGFIX: Fixed the currently playing for non-windows systems.
+	- BUGFIX: Password protection works for plugins.
+	- BUGFIX: Directory access works without trailing '/'
+	- BUGFIX: Make the 'isWindows' function work correctly.
+	- BUGFIX: Serve HTTP header for downsampled audio
+	
+	- Misc: Updated the version number(s).
+	- Misc: Record the remote username of visitors within the access log.
+	- Misc: Record invalid login attempts.
+	- Misc: Allways present $LENGTH and $BITRATE
+	- Misc: Added a reaper function to collect zombie children.
+	- Misc: Don't load DB_File under Microsoft Windows systems.
+	- Misc: /now/ and /recent/ refresh every 30 seconds.
+	- Misc: Tested under Microsoft Windows 2000 Professional.
+	        (Successfully).
+	- Misc: Content type of web pages is served as UTF.
+	- Misc: Added POD to some of the modules.
+	- Misc: Added .aac as an audio file suffix.
+	- Misc: Url encode filenames.
+	- Misc: Renamed '/last' to '/recent'
+	- Misc: Show song tags for the most recent tracks.
+	- Misc: Added UNTESTED local playback (jukebox) mode. 
+	        For single files only.
+
+
+  2.3 [ 16th March 2003 ]
+  	- BUGFIX: Don't attempt to switch user under Windows.
+	- BUGFIX: Search results take notice of 'always_stream'.
+	- BUGFIX: Search results only contain audio files.
+	- BUGFIX: Report the correct title in the search and playlist plugins.	
+	- BUGFIX: Better song tag handling
+	- BUGFIX: stats_args -> stats_arguments
+	- BUGFIX: /playlist/ honours 'song_format' and 'always_stream'
+	- BUGFIX: Make the bug reporting plugin work correctly.
+	- BUGFIX: Better testing of the permissions of our logfile.
+
+	- CLEANUP: Updated the option handling.
+	- CLEANUP: Insert the correct plugin directory into the 
+		   config file upon installation.
+	- CLEANUP: /last/ includes the hostname
+	- CLEANUP: Make sure $HOME is defined before using it.
+
+	- MISC: Added sort by filename to the preferences page.
+	- MISC: Custom playlist feature now displayes nested directories.	
+	- MISC: Allow individual songs to be selected with the custom playlist
+	        feature.
+	- MISC: Show the release version in the --help and --version text.
+	- MISC: Added song info plugin.
+	- MISC: Document that keys and values may span lines with '\'
+	- MISC: Theme files can now include command output.
+	- MISC: Theme files can now include other files.
+	- MISC: The most popular directories now optionally hides plugin dirs.
+	- MISC: Seeking over HTTP works correctly now.
+	- MISC: Custom playlist functionality is much improved.
+	- MISC: Added minimal currently playing support.
+	- MISC: Added the startup files for Mac OS X.
+
+	- DOCUMENTATION: Ensure all configuration values are documented.
+	- DOCUMENTATION: Added specific README's for Windows and Mac OS X
+	- DOCUMENTATION: Added a readme to the templates/ directory.
+
+
+  2.2 [ February 3rd, 2003 ]
+  	- BUGFIX: Install correctly.
+
+
+  2.1 [ February 3rd, 2003 ]
+  	- BUGFIX: Expand $FILENAME
+	- BUGFIX: Password file cleanup.
+	- BUGFIX: Include our own base64 decoding module.
+	- BUGFIX: Include our own mime.types file.
+	
+	- Documentation: Include the INSTALL file in the release.
+	
+
+  2.0 [ February 2nd, 2003 ]
+	- Recoded entirely in Perl.
+	- Updated the man pages.
+	- Display the theme creator alongside the theme name.
+	- Use the system-wide 'mime.types' file when serving content.
+	- Added support for serving/streaming movies.
+        - Updated the bug reporting form considerably.  Mention privacy too.
+	- Add titles to MPEG files via `basename`.title
+	- Handle allowed_clients/denied_clients with CIDR notation.
+	- Improved the sanity testing.
+	- Support for intelligent playlist re-writing.
+	- Added support for per-client preferences.
+	- Added a test system, and several test scripts.
+        - .title files override all other forms of meta information viewing.
+
+	
+  1.0 [ November 30, 2002 ]
+        - MISC: Keep track of the currently streaming songs.
+	- MISC: Optimize CUtility::uc and CUtility::lc
+	- MISC: Optimize CUtility::replaceStrInStr
+	- MISC: Use CUtility::int2str function, which is new, throughout.
+	- MISC: Fixed memory leaks in ID3 tag handling.
+	- MISC: Cleaned up the configuration file.
+	- MISC: Several minor optimizations and cleanups.
+        - MISC: Be more forgiving of user agent identification.
+	- MISC: Use a large buffer when reading stats output.
+
+  	- PLUGINS: Added custom playlist generated plugin.
+	- PLUGINS: Added currently playing plugin.
+	- PLUGINS: Attempt to allow them to build under Cygwin better.
+	- PLUGINS: Allow arbitary plugins to be selectively disabled.
+	- PLUGINS: Search plugin will allow multiple terms.
+	- PLUGINS: Search plugin will highlight matches on the output page.
+	- PLUGINS: Ignore non-readable shared libraries and directories
+	           when searching for plugins to load.
+
+	- CLEANUP: CDirectory::ReadDirectoryRecursively stores directory names.
+        - CLEANUP: Remove .deps and .libs prior to building a distribution.
+	- CLEANUP: Logfiles now record the actual data size served to clients.
+	           As well as the HTTP header code served.
+	- CLEANUP: Minor autoconf changes.
+	- CLEANUP: Report errors in the main GUI if files can't be read.
+	- CLENAUP: Limit $FILENAME to the filename minus suffix, and directory
+	           name.
+
+	- BUGFIX: Updated default config file on gnump3d-top script.
+	- BUGFIX: The stats script will report errors to the server via
+	          STDOUT now - so permission problems will be caught with
+		  ease.  Hopefully.
+	- BUGFIX: Fixed big per-connection memory leak.  :(
+	- BUGFIX: Playlists don't contain duplicate '//''s.
+	- BUGFIX: Directory limiting for searching is restored.
+	- BUGFIX: Send HTTP status code when serving search form.
+	- BUGFIX: Escape directory names when sending banner.
+	- BUGFIX: Exit cleanly if the socket cannot be bound for listening.
+	- BUGFIX: Fixed crash on unreadable .OGG files.
+	- BUGFIX: Make sure the song+directory names in the 'last' plugin
+	          are absolute.
+	
+	- PORTABILITY: Optionally use 'dlopen' interface for loading plugins.
+		       (Useful for Cygwin systems).
+	- PORTABILITY: Detect when building under Cygwin.
+	
+	- Updated version number.
+        - Allow the user to control the display order of files in the GUI, and
+	  in the playlists via new option 'sort_order'.
+	- Allow the server admin to selectively disable individual plugins 
+	  via the configuration file.
+        - Changed all mutex protection.	
+	- Added hook for passing arguments to the stats program.
+	- Attempt to display hostnames rather than IP addresses when possible. 
+	- Track numbers are recognised in OGG Vorbis files.
+	- Serialize incoming requests if we're using paranoid threading.	
+	- Don't use any caching if we're paranoid about threading.
+	- Added support for more media types.
+	- Added new 'RedGrey' theme from Rodolphe Quiedeville
+	- Added new 'LaFrere' theme from Rodolphe Quiedeville
+	- Switched to using the GNU regex code.
+
+
+  1.0-pre1 [ August 19th 2002 ]
+
+        - BUGFIX:  Fixed bad HTML in the /versions/ plugin
+        - BUGFIX:  Applied patch from FreeBSD ports collection.
+        - BUGFIX:  Don't assume a plugin handled the path it said it would.
+        - BUGFIX:  Handle broken 'Host:' headers.
+	- BUGFIX:  Don't abort if the root directory contains '.'.
+	           (Only abort if it contains '..').
+        - BUGFIX:  Strip trailing '/' from root directory if present.
+	- BUGFIX:  Updated the contributed RC files.
+        - BUGFIX:  Escape '+' characters in file and directory names.
+	- BUGFIX:  Make CUtility::splitStr deal with the last entry in the
+	           string correctly.
+	- BUGFIX:  Correctly close shared library handles if they don't
+	           implement our plugin API.
+	- BUGFIX:  Strip the '.so' from plugins when initializing them.
+
+	- CLEANUP: gnump3d-top script decodes URL's prior to display.
+	- CLEANUP: Removed some obsolete config options.
+        - CLEANUP: Moved regular expression class into seperate source +
+	           header files.
+        - CLEANUP: Log malformed requests in 'serveDirectory'.
+	- CLEANUP: Improved Makefile.am's.
+	- CLEANUP: Default template is now valid XHTML.
+	- CLEANUP: The split theme is now valid XHTML.
+	- CLEANUP: The simpled theme is now valid XHTML.
+	- CLEANUP: The default HTML is now lowercased to be valid XHTML
+	
+	- MISC:  Added dump of loaded plugins to /versions/ output.
+        - MISC:  Set the stream URL to something sensible for the WinAmp
+	         minibrowser.	
+	- MISC:  Added optional command line argument '--pid fileName'
+	- MISC:  Reopen the logfile in response to SIGHUP.
+	- MISC:  Added function to mplib - mp_get_bitrate.
+	- MISC:  Record the build date of each file.
+	- MISC:  Allow the size of the servering buffer to be tweaked.
+
+        - PORTABILITY: Reorded headers so that FreeBSD compile works.
+	- PORTABILITY: Fixes for 64bit archs
+	- PORTABILITY: Autoconf stuff may now build without GNU Make.
+
+	- Updated the version number.
+        - Added new playlist type 'random.m3u' this will behave as a
+	  randomized recursive playlist contributed by Mark Howson
+	  <aonq05@dsl.pipex.com>
+	- Added new option 'recursive_randomize' which will force normal
+	  recursive playlists to be randomized also.
+	- Updated the gnump3d-config script to use the correct config file.
+	  (Debian GNU/Linux specific fix).
+	- Added support for downsampling IN PROGRESS..
+        - Expand $LENGTH In the templates -> length of the track in HH:MM:SS	
+	- User playlists are re-written appropriatly.
+	- Added a bug reporting plugin to help people make good bug reports.
+	- Link to the new online forums.
+
+
+  0.9.9.9.2 [Jul 14th 2002]
+  	- BUGFIX: Fixed potential bug with CUtility::replaceStrInStr();
+	- BUGFIX: Correctly terminate the shoutcast header.
+	- BUGFIX: Don't trample on any existing gnump3d.conf file on install.
+	- BUGFIX: Fully qualify the string namespace in CBase64.  (GCC 3)
+        - BUGFIX: Expand '$BPS' into the bitrate of the tracks.
+	- BUGFIX: The track number of MP3's is now available.
+
+	- CLEANUP: Change the parsing of URL parameter arguments.
+	- CLEANUP: Removed several obsolete functions.
+	- CLEANUP: We now use one centralized config file parser.
+
+	- CLEANUP: Only show 'subdirectories' section if subdirs exist.
+	- CLEANUP: Only show 'files' section if songs exist.
+	- CLEANUP: Only show 'playlists' section if playlists are found.
+	- CLEANUP: Only show 'play results' if songs were found in the search.
+
+	- PORTABILITY: Included an Autoconf bootstrapping script.
+	- PORTABILITY: Test for more header files and types in 'configure'
+        - PORTABILITY: Integrated version of 'mplib' for reading ID3v[12]
+	  tags.
+
+	- MISC : Added support for loadable modules with libtool + libltdl
+	- MISC : Migrated lots of core functionality into external modules.
+	- MISC : Added 'last 20 tracks' plugin.
+	- MISC : Added 'theme browsing' plugin.
+	- MISC : A new configuration option 'denied_clients'.
+	- MISC : If a song has no artist + title information use the filename.
+	
+	- Added the ability to limit the starting path of searchs.
+	- Cache the contents of template files.
+	- Included several loop optimizations.
+	- Included an updated Nausicaa theme from Lawrence Lin.
+	- Process and display user generated playlists.
+
+	- Updated the version number.
+	  
+	
+  0.9.9.9.1 [Jun 24th 2002]
+	- CLEANUP: Each theme shows itself as being selected.
+	- CLEANUP: Use libvorbis if available to parse song tags.
+	           [This allows international characters to display]
+	- CLEANUP: 'Play All' links aren't shown for empty directories.
+	- CLEANUP: 'Play Recursively' links aren't shown unless there
+	           are subdirectories present.
+	- CLEANUP: User may specify the text to show for the play all/
+	           play recursively links.
+	- CLEANUP: The banner shown above search pages is correct.
+	
+	- BUGFIX:  Fixed default directory_format string.
+	- BUGFIX:  Made sure that theme_directory is specified in gnump3d.conf
+	- BUGFIX:  Improved URL encoding function to handle foreign characters.
+	- BUGFIX:  Don't send extra newline after the end of HTTP headers.
+	
+	- PORTABILITY: Install to /usr/local/{ bin man etc} by default.
+	- PORTABILITY: Use autoconf + automake.
+	             : Test the libraries we need to use for socket functions.
+	             : Test for different versions of pthreads.
+		     : Insert the correct path to the Perl interpretter.
+	
+
+	- Other Changes:
+	-  Allow content to be served from the template directories, eg logos.
+	-  Updated error messages.
+	-  Added decent error reporting for missing _directories_.
+	-  The search results page show the directory which contains the
+	   given result.
+	-  Minor updates have been applied to the supplied themes.
+	
+	-  All names of scripts directorys and programs have been changed:
+
+	        *mp3d* -> *gnump3d*
+
+	   This is a pain for users, but it's better to do it sooner than
+	   later - we were having collisions with the perl server 'mp3d'
+	
+	-  Optional minimal support for syslog.
+	-  Optional support for libid3.
+	-  Updated version number.
+	
+	
+
+  0.9.9.9 [12-Jun-2002 04:33]
+
+	- CLEANUP: The uninstall target is much more streamlined.
+	- CLEANUP: Permissions are corrected on theme installation.
+	- CLEANUP: Not a single malloc in the entire server!
+	- CLEANUP: Protected all singleton objects with private
+	           copy constructors and assignment operators.
+
+	- BUGFIX: Minor cleanup to allow streaming upon FreeBSD/OpenBSD.
+	- BUGFIX: Only display audio files in the directory listings.
+	- BUGFIX: mp3d-top uses the first 'log_file' value it finds.
+
+	- PORTABILITY: Included patch found in the FreeBSD ports tree.
+	- PORTABILITY: Added distinct NetBSD and OpenBSD Makefiles.
+
+	- DOCUMENTATION:  Moved README-C++ to src/
+	- DOCUMENTATION:  Update man pages.
+
+	- Other changes:
+	-  Updated version number.
+	-  Accept multiple values in 'allowed_clients'.
+	-  Added 'realm' password protection to the server.
+	-  Added base64.[ch] - (Implements realm decoding from BASE64).
+	-  Removed obsolete 'allow_save' config option.
+	-  Added Debian configuration script 'mp3d-config'.
+
+
+  0.9.9.8 [Wednesday, May 29th 2002 16:43 EDT]
+	- CLEANUP: 'make install' will install all themes properly.
+	- CLEANUP: Major updates made to the configuration file.
+	- CLEANUP: Themes are tested for validity prior to usage.
+
+	- BUGFIX: Search results display the correct files.
+	- BUGFIX: Search results takes notice of 'always_stream'.
+	- BUGFIX: Logfile works with '--background'.
+	- BUGFIX: Genres are now supported in MP3's via $GENRE
+
+	- PORTABILITY: User may specify the theme directory.
+	- PORTABILITY: Minor fix for Mac OS X compatibility.
+	- PORTABILITY: Updated the 'test-tag-parser' test program.
+
+	- DOCUMENTATION: Removed duplication in source code documentation.
+
+	- Other changes:
+	-  Updated version number.
+	-  New theme 'nausicaa' - A coloured version of the default.
+	-  New theme 'split' - A two paned 'explorer' style theme.
+	-  Themes may be specified on a per client basis, with cookies.
+	-  All themes have been updated to include a theme choosing option.
+	-  Themes may contain configuration options which override 'mp3d.conf'
+	-  Debian packages built!
+
+
+  0.9.9.7 [16-May-2002 06:43]
+
+	- BUGFIX:  Fixed off-by-one error when reading config file.
+	- BUGFIX:  Fixed thread creation/termination bug.
+	- BUGFIX:  OGG tag parsing is now more robust.
+	- BUGFIX:  `make uninstall` removes the correct binary.
+
+	- PORTABILITY: MacOS X port now builds and runs.
+
+	- CLEANUP:  Added the small test programs to the CVS repository.
+	- CLEANUP:  The server configuration isn't browsable via /status/
+	- CLEANUP:  New virtual path '/search/' which serves a search form.
+	- CLEANUP:  If the hostname isn't set use 'localhost' in playlists.
+
+	- Other changes:
+	-  Updated version number.
+	-  Introduced a theming system which allows end-users to completely
+          customize the appearence of the server.
+	-  Use the clients 'Host: ' header, if present.
+	   (New configuration variable 'use_client_host' controls this).
+
+
+  0.9.9.6 [05-May-2002 22:23]
+	- BUGFIX:  Allow songs to contain '..' in their filenames.
+	- BUGFIX:  Added fixes which allow compilation under GCC 3.x.
+	- BUGFIX:  Tidied up headers + namespaces for GCC 3.x
+	- BUGFIX:  'all.m3u', and 'recurse.m3u' links work for directories
+                   requested without trailing '/' character.
+	- BUGFIX:  Delete the results of CDir::ReadDirectory.
+	- BUGFIX:  Free the results of 'scandir' correctly.
+	- BUGFIX:  Free the results of CUtility::splitString
+
+	- CLEANUP:  Made CServer a singleton object.
+	- CLEANUP:  Renamed all singleton accessors 'GetInstance'.
+	- CLEANUP:  Documented CMutex properly.
+	- CLEANUP:  Removed unnecessary #include's to speed compilation.
+	- CLEANUP:  Minor optimizations to CFile::normalizePath
+
+	- Other changes:
+	- Updated version number.
+	- Received another RC file from: watsondk@pobox.com
+	- Added previous release dates to the changelog.
+	- Be more carefull setting the group + user ID.
+	- Doubled the size of the file serving buffer.
+	- Greatfully received several new logo submissions at:
+		http://www.gnump3d.org/logos.html
+
+
+
+  0.9.9.5 [21-Apr-2002 15:27]
+
+	- CLEANUP: Removed 'CFile::GetFullPath' its not used anywhere.
+	- CLEANUP: Removed some system headers that aren't needed.
+	- CLEANUP: Renamed 'CHeader' class to 'CRequestHeader'.
+	- CLEANUP: Introduced mutex abstraction class 'CMutex'.
+	- CLEANUP: Changed CApacheLog + CDebugLog to have CMutex members.
+	- CLEANUP: Changed the signature of 'sendData'.
+	- CLEANUP: Tidied up the Makefiles for all systems.
+	- CLEANUP: Don't attempt to remove previous versions on 'make install'.
+	- CLEANUP: Install manpages in correct location for FreeBSD.
+	- CLEANUP: Move file comparison function into CFile.
+	- CLEANUP: Move song tag comparison function into CPlaylist.
+	- CLEANUP: Order object files alphabetically.
+	- CLEANUP: Remove '-g' when compiling.
+
+	- BUGFIX:  Close the debug file handle when destroyed.
+	- BUGFIX:  Show unknown command line options after usage info.
+                   (Simpler to read that way).
+	- BUGFIX:  Don't print 'Not reached' - when server exits.
+	- BUGFIX:  Removed a lot of printf's which aren't often seen.
+	- BUGFIX:  Show the correct error message when the server admin
+                   disables access to '/status/'
+	- BUGFIX:  Correctly bound the header when reading a request from the
+	           client.  (Off by one error in CRequestHeader::ReadHeader).
+	- BUGFIX:  New class CConnectionCount; handles max_connections properly
+	- BUGFIX:  mp3d-top takes notice of 'always_stream'.
+	- BUGFIX:  CApacheLog - fixed off by one error in 'AddEntry'.
+	- BUGFIX:  Expand '$COMMENT' in song displays.
+	- BUGFIX:  Display directories sorted alphabetically
+	- BUGFIX:  URL Encode files in playlists, this allows files with '+' in
+	           their names, for example, to work.
+	- BUGFIX:  Use correct thread type - fixes compilation issue on *BSD
+	- BUGFIX:  CUtility::stripWhitespace will return "" if given a string 
+	           composed wholly of whitespace characters.
+	- BUGFIX:  Delete the CClientConnection object on thread termination.
+
+	- DOCUMENTATION:  Updated misleading comments throughout the code.
+	- DOCUMENTATION:  Cleaned up + expanded the man pages.
+
+	- Other Changes:
+	-  Expand $HOST in the header and footer templates.
+           (This is $HOSTNAME minus any domain information).
+	-  New option 'allow_saving' if this is enabled a 'save' link is
+	   generated next to each track, to allow simple downloads.
+
+
+  
+  0.9.9.4 [14-Apr-2002 09:09]
+
+	-  Major update : Re-wrote all the code in C++.
+	-  Major update : Re-wrote all the code in C++ - worth stating twice.
+
+	-  DOCUMENTATION:  Added manpages, in doc/
+	-  DOCUMENTATION:  Updated README for grammer, spelling, etc.
+	-  DOCUMENTATION:  Added README-C++
+	-  DOCUMENTATION:  Updated comments in 'mp3d.conf'
+	-  DOCUMENTATION:  Document the hostname option in mp3d.conf
+	-  DOCUMENTATION:  Added source code documentation in src/html/
+
+	-  BUGFIX: Handle the debugging options correctly.
+	-  BUGFIX: Expand the MP3 Albumn tag, via $ALBUM.
+	-  BUGFIX: Close filehandle when an abort happens on file serving.
+	          (ie. ignore SIGPIPE).
+	-  BUGFIX: Allow searching on song tags
+	-  BUGFIX: Abort if the configuration file doesn't exist.
+	-  BUGFIX: Handle directories without a trailing '/' correctly.
+	-  BUGFIX: Removed striping on search results.
+	-  BUGFIX: Terminate headers with '\r\n' as per RFC's.
+	-  BUGFIX: Don't show play link if search returns no results.
+	-  BUGFIX: URL encoding/decoding RFC 1738 compliant.
+	-  BUGFIX: Loop until all network data sent - stops random stuttering.
+
+	-  PORTABILITY: Code builds + runs on Solaris properly now.
+	-  PORTABILITY: Updated Cygwin build.
+	-  PORTABILITY: Embryonic MacOS X support.
+	-  PORTABILITY: Use 'stat' instead of FILE * functions.
+
+	- Other changes:
+	-  Tidied up the startup banner.
+	-  Removed logo from the source code repository, now in website src.
+	-  Implemented access controls, and connection limiting.
+	-  /status/ now shows source versions.
+	-  Configurable shoutcast title streaming - thanks to the author of
+	   Ample for a good explaination of how this works:
+		http://ample.sf.net/
+	-  New command line option '--background'
+	-  Received an RPM .spec file, from:
+	   Angles  Puglisi <devel@aminvestments.com>
+ 	-  Perform thread cleanup correctly.
+	-  Parse OGG Vorbis tags - this is very simplistic.
+	-  Cache the ID3/OGG TAG information which we retrieve.
+	-  Added debug tracing throughout the entire codebase.
+	-  Add option to disable server browsing, strange as that might seem.
+
+	
+	
+  0.9.9.3 [12-Mar-2002 07:48]
+
+	-  Made portability fixes to portable.c - for FreeBSD.
+	-  Added Slackware rc file, 
+	   from : Boris Kurktchiev <linux@BgDefenderS.zzn.com>
+	-  Added logo, from: Adam Doxtater <adoxx@hotmail.com>
+	-  Made the daemon re-read its configuration file upon receipt
+	   of SIGHUP.
+	-  Allows config file to control the notion of what is an audio file.
+	-  BUGFIX: Make sure file info is served with a playlist for a single
+ 	   file, as a result of 'always_stream=1', and 'advanced_playlist=1'
+	-  Added Access Control, based upon IP addresses.
+	-  Updated Header template, contributed by :
+	   Boris Kurktchiev  <linux@BgDefenderS.zzn.com> 
+	-  BUGFIX: Send proper HTTP header prior to sending error messages.
+	-  BUGFIX: Send message to clients that aren't allowed to connect.
+	-  Default to appending to our logfile, with config file controlling
+	   whether we truncate or not.
+	-  BUGFIX: Stop blanking out the hostname, as this broke the template
+	   expansion.
+	-  Removed all references to WIN32 - AS OF NOW THERE IS NO WINDOWS PORT
+	-  Show IP address (hostname) in the top N users.
+	-  CODE-CLEANUP: Handle the special requests in a neater manner.
+	-  CODE-CLEANUP: Don't, needlessly, return the requested path
+	-  BUGFIX: Remove trailing slashes from clickable directory headers.
+	-  mp3d-top : Don't cache hostnames needlessly.
+	-  BUGFIX: Removed the trailing slash which is displayed on 
+	   all directory names in the main index.
+	-  BUGFIX: $VERSION is now expanded in header + footer files.
+	-  BUGFIX: mp3d-stats use numerical comparison, fix by
+           TAHARA Ryozo <r-tahara@yamatosokki.co.jp>
+	-  BUGFIX: serve .m3u files properly, fix by:
+           TAHARA Ryozo <r-tahara@yamatosokki.co.jp>
+	-  Updated handling of comments, and 'logfile' key in mp3d-top from:
+	   TAHARA Ryozo <r-tahara@yamatosokki.co.jp>	
+   
+
+
+  0.9.9.2 [01-Mar-2002 10:47]
+
+	-  Moved mutex handling code into threads.[ch]
+	-  Added Cygwin Makefile.
+	-  Renamed links to '/' to read 'Home'
+	-  Added song titles to playlists, so that the players may use them.
+	   This is controlled by the config entry "advanced_playlist".
+	-  Wrapped server status in pretty HTML to match search results, etc.
+	-  Avoided reading the 'Hostname:' from client requests, if this
+	   is not equal to our server hostname bad things are afoot - the
+	   server hostname may be explicitly set by the configuration entry
+	   'binding_host' option anyway.
+	-  Re-write playlist files on the fly, if they aren't http entries.
+	   Code from: TAHARA Ryozo <r-tahara@yamatosokki.co.jp>
+	-  Added a statistics program, which is run when people request
+	   '/stats/'
+	   (The statistics program is "mp3d-top", and running 
+	    "mp3d-top --help" will give running instructions.)
+	-  Added an RC file for Debian.
+	-  Tidied up the usage of the configFile, and port handling.
+	-  Added the "contrib/debian/" directory, which can be used to build
+	   a .deb binary file - contributed by : Henning Glawe <glawe@web.de>
+	-  Created contrib/win32/
+	-  Finally solved the issues with terminating the server.
+	   As suggested by : Andrew Birkett <adb@tardis.ed.ac.uk>, over a pint.
+	-  Honour the "Range:" header - this allows people to seek within a 
+	   song, if the player supports it.  (WinAmp does).
+	-  Made all the files + directories in the stats page clickable.
+	-  Allow the user to specify the colour of the border used in all
+	   the display sections, via the "border_colour" config file entry.
+	-  Massive code commentry update.
+	-  Fixed a filehandle leak.  (We were losing one handle for each 
+	   music file served).
+	-  Added the ability to play all the results of a search.
+	-  Added SuSe rc file, from: Daniel Troeder <daniel@troeder.de>
+
+
+
+  0.9.9.1 [23-Feb-2002 12:35]
+
+	- Added simple search.
+	- Added option 'search_enabled'.
+	- Updated header template to include a search form.
+	- Search results now honour the 'always_stream' flag.
+	- Added patch to encode URL's in generated playlists, from:
+	  Francesco Usseglio Gaudi <cecco@libero.it>
+	- Perform variable expansion in /status page.
+	- Improved the portability of code in 'portable.c'.
+	- Fixed playlists so they are served properly.  
+          (Hand made playlists, which are placed in the directory tree,
+          not the auto-generated all.m3u / recurse.m3u files).
+	- Updated the comments in the supplied config file considerably.
+	- Updated the links at the top/bottom of directories to be made of 
+	  links to the path components.	
+	- Fixed access logging, the log is written at the start of a 
+	  file-serving transaction, not the end.
+
+
+
+  0.9.9  [19-Feb-2002 11:57]
+
+        - Created a centralized routine for searching for files.
+	- Migrated existing code to use it.
+        - Updating network connection, no more "Address already in use" errors!
+	- Addition of a new config option, to specify the log file.
+	- Accesses are logged in an Apache common log compatable format.
+	- BUGFIX: Playlists had erroneous '\n' character in them.
+	- BUGFIX: Report + abort on unknown command line option.
+	- BUGFIX: make install works correctly, and the binary reads
+          the installed configuration file properly.
+	- New 'theme' system, allows all pages to be surrounded by
+	  user specified text.
+	- Expand $HOSTNAME, and $DIRECTORY in template files.
+	- BUGFIX: Install signal handlers only if they're available.
+	  Contributed : by Alan Stein <ajs@ajsoft.com>
+	- Updated the Win32 port.
+TODO: FIXME - Allow playlists to be listed in the directory tree.
+        - BUGFIX: Handling of missing files killed server, if they didn't
+          have a suffix.
+	- BUGFIX: The number of currently active connections only increased.
+
+
+
+
+  0.9.8  [12-Feb-2002 10:02]
+
+        - Changed the link title for the server status.
+	- Updated the header + footer.
+	- Made some code cleanups.
+	- Moved all file handling code to files.[ch].
+	- Moved all debug handling code to debug.[ch]
+	- Added 'always_serve' option, as suggested by : Thomas Sattler
+	- Fixed up logging, so that 'all.m3u', and 'recurse.m3u' are
+	  correctly reported.
+        - Added a simple build system for dealing with new platforms,
+	  this includes those files/changes submitted by other people.
+	- Fixed bug: generated m3u files not having port numbers in them.
+	- Fixed bug: searching for suffixes stopped at the first period.
+	- Code cleanup : Pass connection_info around, not client_socket.
+	- Code cleanup : centralized debug interface.
+	- Added --debug switch, to replace the x-debug target.
+	- Added "ostype" to the --version information, and updated the startup banner.
+	- Added Emacs mode settings.
+	- Fixed bug: signal 11 -> replacestrinstr was buggy.  bigtime.
+	- Fixed bug: make sure subdirectories + links have "%20", not ' '.
+
+
+
+  0.9.7 [08-Feb-2002 04:01]
+
+	- Added id3parse.[ch] - C routines for accessing ID3 tags.
+	- A new make target 'test': will build test programs for the ID3 parser,
+	  and the config file parser.
+	- Allow user to specify how files are displayed, via 'song_format'
+	- Fixed issue with processing the files in a directory.
+	- Updated the handling of missing files to send the appropriate
+	  HTTP status code, (404), along with a more friendly error message.
+        - A working recursion option.
+	- Added bzero, and stricmp implementations for those that lack them.
+	- Test that the root directory exists before starting the server. D'oh.
+	- Updated "IsAudioFile", to compare case insensitively, this fixes 
+	  incorrect file count bugs.
+	- Added DoesDirExist
+	- Allow the server to change UID & GUID after bind().
+	  (means server can be started with port<1024, and no risk ;).
+	- Send "Date" headers with all pages.
+	- Save starting date + time of server, not just time.
+	
+
+
+
+  0.9.6 [08-Feb-2002 04:01]
+
+	- Added basic logging; connection number, ip address, and request path
+	- Added server-start-time to the status page.
+	- Show the number of active connections.
+	- Added new configuration option "stripe_depth", controls the size of
+	  stripes.
+	- Updated the HTML generation, to change the layout.
+	- Updated Makefile(s) to build on FreeBSD.
+	- Added server stats in a basic manner.
+
+
+
+  0.9.5  [06-Feb-2002 04:34]
+
+	- Added the configuration file, to control the server, this involves
+	  the introduction of many new features, eg. controllable mime typing.
+	- Added parse.[ch], removed getopt.[ch].
+	- Added the ability to report on server status.
+	- Added test program for the parser.
+	- Added '--quiet' option.
+
+
+
+  Released to the World, via Freshmeat.net
+
+  Pre-history:
+
+  0.9  - Allows directory contents to be played, via an "All" link.
+
+  0.8  - Shows the contents of directories in an attractive manner.
+       - Allows navigation back up the directory tree.
+
+  0.7  - Correctly processes directories.
+       - Ignores '.' files, and directories.
+       - Has a root directory, browsing outwith this is prohibited.
+
+  0.6  - Serve files.  Woo hoo!
+	 No longer shows dotfiles of any kind.
+         Note: content type is fixed at text/html.  This should be
+         teakable via a config file, something like:
+
+         [MimeTypes]
+         .htm=text/html
+         .html=text/html
+         .txt=text/plain
+
+  0.5  - Shows directory listings, which include ".", and ".."
+
+  0.4  - Replace string in string works multiple times.
+
+  0.3  - Control the errors, via text substitution.  Replace this with
+         an error file for each permissable error, eg. HTTP 404 -> not found.
+
+  0.2  - Send an error message when things go bad... ;)
+
+  0.1  - Start up the listening socket - and make sure that its not
+         already in use, and >= 1024

@@ -1,0 +1,69 @@
+
+
+GNUMP3d Plugins
+---------------
+
+  When the 2.9.9 release of GNUMP3d goes out there will be three
+ types of plugins available:
+
+	1.  Pre-processing requests.
+	2.  Processing plugins.
+	3.  Post-processing requests.
+
+  Right now only the second is available, and that is yet incomplete.
+
+
+Pre-Processing Plugins
+----------------------
+
+  This are arbitary plugins which are handed the incoming request
+ from each client.
+
+  They may modify, or rewrite, the incoming requests as they see
+ fit.  Once this action has been performed the incoming request
+ is untouchable - it has been discared.
+
+  Possible use?  This could be used to handle the security features:
+
+	1.  Sanitizing input paths.
+	2.  Testing for denied/allowed clients by IP addresses.
+	3.  Testing for valid usernames + passwords.
+
+
+
+Processing Plugins
+------------------
+
+  These are the "standard" plugins, they are called by the server
+ when incoming requests are made.
+
+  For each request, /foo, the GNUMP3d server queries each available
+ plugin:
+
+	1.  Load plugin.
+	2.  Call "wantPath( /foo' );"
+	3.  If 'wantPath' returns true then the plugin handles
+           the request via a call to 'handlePath'.
+
+
+
+Post-Processing Plugins
+----------------------
+
+  This are arbitary plugins which are handed the complete text
+ of the response - for any given MIME type.
+
+  They may rewrite the output before the client sees it.
+
+
+  Usage?  HTML Validation?
+
+
+Steve
+--
+
+$Id: PLUGINS,v 1.3 2005/12/04 17:50:01 skx Exp $
+
+
+-- See also:
+    http://www.perlmonks.org/?node_id=120920

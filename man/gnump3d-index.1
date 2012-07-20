@@ -1,0 +1,52 @@
+\" Process this file with
+.\" groff -man -Tascii foo.1
+.\"
+.TH gnump3d-top 1 "March 2002" Linux "User Manuals"
+.SH NAME
+gnump3d-index \- Create a simple database of audio tags.
+.SH SYNOPSIS
+.B gnump3d-index [--options]
+.B ...
+.SH DESCRIPTION
+.B gnump3d-index
+is a companion program to
+.BR gnump3d (1)
+which will build up a simple database of all the tag information contained in the audio files beneath your music root.
+
+This database will be used throughout the gnump3d code to speedily gain access to the tags that your music contains.
+
+
+.SH OPTIONS
+.IP --debug
+Show all the tags we've found in each file we are indexing.
+.IP --help
+Show minimal help information.
+.IP --root
+Specify the root of your audio archive.
+.IP --stats
+Show the total number of audio files within your archive, and the space they occupy.
+.IP --version
+Show the version number of the script.
+.IP --verbose
+Show the progress we're making in the indexing.
+.IP --version
+Show the version number of the script
+
+.SH NOTES
+.RS
+The display of the song statistics will include the total number of files in the archive, their total playlength, and the total size occupied.
+This may be useful for bragging contests.
+
+.SH FILES
+.I gnump3d.conf
+.RS
+The system wide configuration file. See
+.BR gnump3d.conf (1)
+for further details.
+
+.SH AUTHOR Steve Kemp <steve@steve.org.uk>
+
+.SH "SEE ALSO"
+.BR gnump3d (1),
+.BR gnump3d.conf (1)
+

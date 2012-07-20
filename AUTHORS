@@ -1,0 +1,507 @@
+
+  The primary author of GNUMP3d is Steve Kemp <steve@steve.org.uk>
+
+  The following people have contributed either code, ideas, or
+ useful bug reports to the software.
+
+
+  v2.9final
+    -  Samuel Alba
+       Contributed HTTP Auth-Digest support.
+
+  v2.9.9
+    -  Ibon
+       Basque translation of the language file.
+
+    - Dave Slotter
+       Minor bugfixes in Makefile and default configuration file.
+
+    - Andrew McGuinness
+       Improved the OGG Vorbis tag file reading.
+
+    - Ross Mohn
+       Contributed code to display playlist information too.
+
+    - Michael Collard
+       Provided patches for several cleanups and enhancements.
+
+    - Juanra Dikal
+       Provided a patch for sorting directories in the playlist plugin.
+
+    - Matthew Cheetah
+       Provided multiple useful patches to fix caching issues, random
+       generation, whitespace issues, ratelimitting, and more!
+
+  v2.9.8
+    -  C. Menge
+       Supplied an updated German language translation.
+
+    - Ibron
+       Gave an initial Spanish translation.
+
+    - Stan Mulder.
+       Contributed another theme, Avalon.
+
+  v2.9.6
+    -  C. Menge
+	   Playlist length count bugfix.
+
+    -  Rafael Bohrer Avila:
+       Provided fix for playlist + directory name handling in case of clash.
+
+    -  Ross Mohn
+       Informed me that .ram files are playlists, not audio files.
+
+
+  v2.9.5
+    -  Solomon Peachy:
+	   Refactored much song tag code
+	   Fixed info plugin to use song tags directly.
+           Fixed multiple stat() calls in the indexer.
+
+    -  Matti Somppi
+ 	   Some filename escape bugfixes, and a bugfix with new_count.
+
+    -  Aaron Longson
+	   Improved filename escaping.
+
+    - Michael Rensing
+	   HTML Validation cleanup on the playlist plugin.
+
+    - Daniel Eiland
+	   New theme, Liquid.
+
+    - Aaron Brown
+           New theme, BlueBox.
+
+    - Erik Vandekieft
+	   MP4 tracknumber bug report, and fix.
+
+    - Jack Twilley
+	   Contributed patch to show the time of the most recently played tracks.
+    - C. Menge
+           Provided enhancements to deal with the "currently playing" files on 
+           Microsoft Windows platforms.
+
+
+
+  v2.9.4
+    -  Solomon Peachy
+       Fix a double slash strip bug.
+
+  v2.9.3 
+    -  Solomon Peachy  
+       Show "NEW" next to files instead of just directories.
+       Add incremental tag cache updates
+       Assorted bugfixes
+       Consolidated tag reading code into one place
+
+    -  Martin Lohmeier
+       Bugfix for broken Nomad theme link.
+
+    -  Philip Chan
+       Contributed fix to the URL encoding on the random plugin page.
+       Added support for reading tag information from .WMA files.
+	
+    -  Adrien BUSTANY 
+       French language translation.
+       Added support for .aac/.mp4 files.
+
+    -  Reid Rivenburgh
+       Contributed patch for sorting by file modification date.
+
+
+
+  v2.9.1 / 2.9.2
+    -  Martin Lohmeier
+       Contributed fix to mp3info to handle broken tags better.
+
+    -  Jeff Smith
+       Contributed the new theme - Musicus.
+
+    -  Aaron Longson 
+       Minor bugfix with quoting files for external commands.
+
+    -  Solomon Peachy 
+       Contributed changes to speed up tag cache handling.
+
+
+  v2.9
+    -  Russell Sears
+       Fixed infinite loop when calling random playlist and having
+       no tag cache file.
+
+    -  Matthew "Cheetah" Gabeler-Lee <cheetah@fastcat.org>
+       Supplied cleanups to downsampling tag handling, and command quoting.  
+
+    -  <dth@dth.net>
+       Supplied a minor typo fixup for my bad spelling.
+
+    -  Sol DeMuth <sledmouth@hotpop.com>
+       Added a new theme optimized for handheld devices.
+
+    -  Harry Nelson <harry@zenixunderground.org>
+       Contributed several bugfixes to the custom playlist plugin.
+
+    -  Tormod Volden <volden@iqe.phys.ethz.ch>
+       Contributed cleanup for track number sorting.
+
+	-  Greg Stoll
+	   Contributed bugfix with the rewriting of pre-made playlists.
+
+	-  Geoff Silver <geoff@uslinux.net>
+	   Contributed code to rewrite URLs when behind a proxy server.
+
+
+  v2.8
+    -  Brett Kuskie <mstrprgmmr@chek.com>
+       Supplied bugfix for HTTP date logging.
+
+	-  Ross Palmer Mohn <rpmohn@panix.com>
+       Contributed patch to leave external playlists alone.
+	   Contributed patch to walk up music archive looking for passwords.
+
+	-  Martin Lohmeier <blackm@ferris.dyndns.info>
+	   Contributed fix for logrotation; closing the server socket in
+	   the child processes to allow clean restarts.
+
+	-  Tuukka Hastrup <Tuukka.Hastrup@iki.fi>
+	   Contributed patch to fix playlist encoding issues.
+
+    -  Morgan Nilsson <morgan@lysator.liu.se>
+	   Highlight entire row in the Tabular theme.
+
+
+  v2.7
+    -  "Dau, Bernd" <Bernd.Dau@t-systems.com>
+  	   Contributed the German language translation.
+
+	-  Adam DiCarlo <aph@debian.org>
+	   Several cleanups, and a much enhanced search plugin.
+	   Browse tracks by category module.
+
+	-  Pat Riehecky <prieheck@iwu.edu>
+       Contributed new 'SchwartzNGrau' theme.
+	   Contributed startup script for Gentoo.
+
+    -  Matthew "Cheeta" Gabeler-Lee <cheetah@fastcat.org>
+	   Playlist formatting cleanup suggestion and patch.
+
+	-  Christian Kreibich <christian@whoop.org>
+	   Alternating colours for the index displays.
+	   Cleaned up the coding of the dotNET theme.
+
+	-  Gordon Haverland <ghaverla@materialisations.com>
+	   Supplied patch to cach metadata based upon file modification times.
+	   The massively speeds up the indexing of the music archive.
+
+	-  Mark Schouten 
+	   Supplied code to cache downsampled files if they already exist.
+
+	- "LIENARD S?bastien GC EUR" <sebastien.lienard@globecast.com>
+	   Persist downsample quality in pre-made playlists.
+
+	 
+  v2.6  - Solomon Peachy <pizza@shaftnet.org>
+  	  Contributed excellent tag caching speedup code.
+	  Fixed banner issues with trailing '/'.
+
+	- Rudolf Polzer <rpolzer-gmp3-3p@durchnull.de>
+	  Several bugfixes.
+
+        - Eric Thelin <eric@thelin.org>
+	  Sent patch to make gnump3d-index follow symlinks.
+
+	- Simon Proctor
+	  For office banter and help with variable interpolation
+	  in lib/gnump3d/lang/lookup.pm
+
+
+  v2.5b	- GoneCrazy <gonecrazy@gonecrazy.com>
+          Contributed an updated 'run.bat'
+
+  
+  v2.5  - Dan Pelleg <daniel+gnump3d@pelleg.org>
+          Contributed fix for zombie processes under downsampling.
+
+	- MarquiS <marquis-@gmx.net>
+	  Contributed the dotNET theme
+	  
+	- Hans Fugal <hans@fugal.net>
+	  Fixed OGG Vorbis comment handling.
+	
+	- GoneCrazy <gonecrazy@gonecrazy.com>
+	  Contributed the guide for installing GNUMP3d as a Windows Service.
+
+	  
+  v2.4  - Dan <dan@audioanarchy.com>
+	  Fixed up the logfile format to be acceptible to webtrends.
+
+	- Matthew Swann <swannman@mac.com>
+	  Corrected my mistakes in downsampling filenames containing spaces.
+          Suggested killing of zombie downsampling processes.
+
+	- Norbert Kiesel <nkiesel@tbdnetworks.com>
+	  Submitted patch to make sorting by track number work again.
+          and cleanups for Ogg Vorbis files.
+
+	- Seppo Takalo <sepeto@bigfoot.com>
+	  Fixed bug in downsampling, by serving the appropriate mime type.
+
+  v2.3  - Eric Lawrence <lawrence@reed.edu>
+          Contributed cleanups for MacOS X
+	  Including the startup information.
+
+  v2.2  - Daniel Lyons <>
+    	  Alerted me to Security Hole.
+
+  v2.0  - Jeffrey Hellem <thexder@phildowd.com>
+	  Contributed the Thexder theme.
+
+
+  v1.0  - Kirt Gillum <gillum@nctech.com>
+	  Re-submitted the CUtility::splitStr fix from Jack Twilley which
+          somehow escaped being included in the previous release.
+
+	- Morgan Nilsson <morgan@lysator.liu.se>
+	  Fixed spelling error in configure script.
+	  Spotted the failure to encode directory names in the banner.
+
+	- Perry Cameron <perry_cameron@hotmail.com>
+	  Contributed another logo.
+
+	- "Steven Marshall" <smarsh6@hotmail.com>
+	  Reported $FILENAME wasn't doing the correct thing.
+
+        - Thorsten Schnier <thorsten+v4l@schnier.net>
+	  Fixed OGG Vorbis tag parsing to handle the track numbers too.
+
+	- Darran <>
+	  Added added MIME types for more media formats.
+
+	- Brian <>
+	  Contributed updated text for the gnump3d.conf downsample settings.
+
+	- Rodolphe Quiedeville <rq@lolix.org>
+	  Contributed both of the two new themes, 'RedGrey', and 'LaFrere'
+
+
+  v1.0-pre1
+  	- Thorsten Kukuk <kukuk@suse.de>
+	  Contributed cleanups to various Makefile.am's.
+	  Suggested stripping suffix from plugins to initialize them properly.
+
+  	- Thorsten Kukuk <kukuk@suse.de>
+	  2. Spotted bug with incorrect root directory handling. 
+
+	- Boris Kurktchiev <linux@bgdefenders.zzn.com>
+	  Contributed updates to the Slackware RC file he'd previously donated.
+
+	- Per Mellstrand <per@mellstrand.com>
+	  Spotted the broken encoding of '+' characters.
+
+	- Mark Howson <aonq05@dsl.pipex.com>
+	  Contributed a patch to provide random recursive playlists.
+
+	- Jack Twilley <jmt@twilley.org>
+	  Fixed bug in CUtility::splitStr
+	  Contributed work towards downsampling.
+
+	- Brian Bock
+	  Spotted segfault on plugin load - provided good strace.
+
+	- Christian Weisgerber <naddy@freebsd.org>
+	   Contributed changes to the use of std::string finds so that
+	  the code works upon 64 bit machines.
+	   Suggested the use of --include-deps when running automake.
+
+	- TAHARA Ryozo <r-tahara@yamatosokki.co.jp>
+	  Tidied up the playlist re-writing code.
+
+
+  v0.9.9.9.2
+	- Ben Finney <bignose@zip.com.au>
+	  Contributed work towards serving user-generated playlists.
+
+	- Andrew Bancroft <ABancroft@lgc.com>
+	  Spotted potential infinite loop in CUtility::replaceStrInStr()
+
+	- Jan Starzynski <jan@planet.de>
+	  Suggested the ability to limit searching by directory.
+
+	- Lawrence Lin <llin@u.washington.edu>
+	  Updated the nausicaa theme.
+
+	- Jan Starzynski <jan@planet.de
+	  Supplied fix for the shoutcast header bug.
+
+	- jmpnthfire  <jmpnthfire@yahoo.com>
+	  Contributed a new logo for the website.
+
+
+  v0.9.9.9.1 
+	- Hans Fugal <hans@fugal.net>
+	  Assisted in the fixing of the URL encoding.
+
+	- Lawrence Lin <llin@u.washington.edu>
+	  Suggested the serving of files from within the theme directories.
+
+	- Colin Tinker <colin.tinker@g1gsw.org>
+	  Made RPM's.
+
+
+  v0.9.9.9
+	- Left Eye LOPEZ <scott@lackluster.net>
+	  Provided an account on his FreeBSD box to let me fix a
+ 	  BSD specific problem.
+
+	- KATO Tsuguru <tkato@prontomail.com>
+	  Supplied a patch for the FreeBSD ports collection.
+
+
+  v0.9.9.8
+	- "Scott Merrill" <skippy@skippy.net>
+	  Submitted the idea of the 'split' theme.
+
+	- Lawrence Lin <llin@u.washington.edu>
+	  Submitted the 'nausicaa' theme.
+
+
+  v0.9.9.7
+	- Dennis <dennis_marti@yahoo.com>
+	  Made the changes necessary to build upon MacOS X.
+
+
+  v0.9.9.6
+	- <watsondk@pobox.com>
+	  Contributed a new RC file.
+
+        - j. <jfarr@cta-dxs.com> 
+	  Fixed several issues which had prevented compilation with GCC 3.x.
+
+
+  v0.9.9.5 
+	- Lawrence Lin <llin@u.washington.edu>
+	  Pointed out the error with mp3d-top not appending .m3u suffix.
+
+	- Myke Carter <mykec@ionet.net>
+	  Spotted the lack of $COMMENT in 'song_format'
+
+	- Mike Harris <mharris@addictzsystems.org>
+	  Reported files containing '+' in their names don't stream/download.
+	  This was a lovely bug report to read, he included all the information
+          and had made an attempt to locate the bug.
+
+
+  v0.9.9.4
+	- Andrew Birkett <adb@tardis.ed.ac.uk>
+	  Submitted updates to the README, (grammer, spelling, etc).
+	  Updated Cygwin build.
+
+        - Lawrence Lin <llin@u.washington.edu>
+	  Pointed out the lack of $ALBUM.
+
+	- Robert Raschke <r.raschke@acm.org>
+	  Suggested making the conversion to C++ 'in-place'.
+
+	- Angles Puglisi <devel@aminvestments.com>
+	  Submitted the RPM spec file.
+
+	- David H?rdeman <david@2gen.com>
+	  Explained how shoutcast title streaming worked.
+	  (Author of Ample - http://ample.sf.net)
+
+	- Lawrence Lin <llin@u.washington.edu>
+	  Pointed out minor errors in Slackware RC file.
+
+	- "Reza Naima" <reza@reza.net>
+	  Noticed the lack of OGG tag handling.
+
+	- Gustavo Niemeyer
+	  Wrote the RFC 1738 compliant URL Encoding/Decoding routines see:
+	  https://sourceforge.net/snippet/detail.php?type=snippet&id=100058
+
+
+
+  v0.9.9.3
+	- Adam Doxtater <adoxx@hotmail.com>
+	  Contributed logo.
+
+	- Boris Kurktchiev <linux@BgDefenderS.zzn.com>
+	  Contributed the RC file for Slackware.
+	  Contributed updated HTML header file.
+
+	- Andrew Birkett <adb@tardis.ed.ac.uk>
+	  Contributed some spelling corrections, and grammer fixes.
+
+	- TAHARA Ryozo <r-tahara@yamatosokki.co.jp>
+	  Minor updates to the m3u handling.
+	  Fixed mp3d-top to use numerical comparisons.
+	  
+
+
+  v0.9.9.2
+	- TAHARA Ryozo <r-tahara@yamatosokki.co.jp>
+	   Rewrite playlists on the fly, if they don't contain
+	   URLs, just paths.
+
+        - Henning Glawe <glawe@web.de>
+	   Contributed the files necessary to build a debian package.
+
+	- Andrew Birkett <adb@tardis.ed.ac.uk>
+	   Suggested how to handle the termination of the main accept loop.
+
+	- Daniel Troeder <daniel@troeder.de>
+	   Contributed a SuSe GNU/Linux RC file.
+
+
+
+  v0.9.9.1
+
+	- Francesco Usseglio Gaudi <cecco@libero.it>
+	   Handle encoding of files in playlists.
+
+
+
+  v0.9.9
+
+        - St<E9>phane Billiart <stephane@reefedge.com>
+	   Handle UTF-8 characters in requests.
+
+	- Gordon Dey <gordon.dey@basement.igs.net>
+           Suggested bugfix, non-audio files were present in directory
+           listings.
+
+
+
+  v0.9.8
+	- Thomas Sattler <tsattler@rbg.informatik.tu-darmstadt.de>
+	    Suggested the use of 'always_serve'
+
+
+
+  v0.9.7
+	- Christian Weisgerber <naddy@mips.inka.de>
+	    Suggested passing the configuration directory, "/etc/" as
+           a makefile parameter.
+
+
+
+  v0.9.6
+	- John <jsb8@aber.ac.uk>
+	    Fixed an uninitialized variable that caused errors connecting.
+	    Added code for viewing the number of active connections.
+
+	- Robin <Robin_Blanchard@gactr.uga.edu>
+	    Supplied a Makefile for FreeBSD, which I've adapted and included.
+
+	- Andy Birkett <adb@tardis.ed.ac.uk>
+	    Several good suggestions, and spotted a couple of issues with
+            % decoding.  (Such as masking out %07 - to stop people beeping
+            at the console.  Grr!).
+
+< v0.9.5
+
+	- Steve Kemp <skx@tardis.ed.ac.uk>
+	    All code.  
+

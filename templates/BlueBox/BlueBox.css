@@ -1,0 +1,260 @@
+/* ------------------------------------------------------------------------ */
+/*	Theme:		BlueBox
+/*	Designer:	Aaron Brown - http://www.thebrownproject.com/
+/* ------------------------------------------------------------------------ */
+
+/* ------------------------------------------------------------------------ */
+/*	Basic Tags
+/* ------------------------------------------------------------------------ */
+body {
+	background-color:	#dde;
+	font-family:		"Trebuchet MS", Trebuchet, "Bitstream Vera Sans", Arial, Helvetica, sans-serif;
+	font-size:			8pt;
+	padding:			40px;
+	margin:				0;
+}
+a {
+	color:				#000;
+	text-decoration:	none;
+}
+a.bar {
+	color:				#000;
+	text-decoration:	none;
+	border-left:		4px solid #99b;
+	padding-left:		4px;
+}
+a.bar:hover {
+	border-left:		4px solid #66a;
+}
+
+/* ------------------------------------------------------------------------ */
+/*	Page Layout framework
+/* ------------------------------------------------------------------------ */
+table.framework {
+	width:				100%;
+	border-collapse:	collapse;
+	border:				none;
+	padding:			0;
+	margin:				0;
+	font-size:			1.0em;
+}
+table.framework td.left-panel {
+	width:				130px;
+	padding-right:		10px;
+	text-align:			left;
+	vertical-align:		top;
+}
+table.framework td.right-panel {
+	text-align:			left;
+	vertical-align:		top;
+}
+
+/* ------------------------------------------------------------------------ */
+/*	Left column (menu, navigation)
+/* ------------------------------------------------------------------------ */
+#static {
+/* "static" is the div which contains the title and menu blocks.  Its position	*/
+/* is fixed at the top left of the browser window for CSS2-compliant browsers.	*/
+	position:			fixed;
+	top:				40px;
+	left:				40px;
+	width:				130px;
+}
+#title-panel {
+	padding:			8px 0;
+	margin-bottom:		10px;
+	border:				2px solid #99b;
+	font-size:			1.4em;
+	font-weight:		bold;
+	color:				#000;
+	background-color:	#fff;
+	text-align:			center;
+}
+#title-panel a {
+	color:				#000;
+	text-decoration:	none;
+}
+div.menu-panel {
+	padding:			8px 0;
+	margin-bottom:		10px;
+	border-top:			none;
+	border-right:		2px solid #99b;
+	border-bottom:		2px solid #99b;
+	border-left:		2px solid #99b;
+	background-color:	#fff;
+}
+#menu-panel-title {
+	width:				100%;
+	font-size:			1.2em;
+	font-weight:		bold;
+	color:				#fff;
+	background-color:	#99b;
+	padding:			2px 8px;
+	margin-bottom:		8px;
+}
+div.panel-title {
+/*	width:				100%;	*/
+	font-size:			1.2em;
+	font-weight:		bold;
+	color:				#fff;
+	background-color:	#99b;
+	padding:			2px 8px;
+	border-top:			2px solid #99b;
+	border-right:		2px solid #99b;
+	border-bottom:		none;
+	border-left:		2px solid #99b;
+}
+div.menu-panel a {
+	color:				#000;
+	text-decoration:	none;
+	line-height:		2.0;
+	padding:			0px 6px;
+	margin-left:		8px;
+	border-left:		4px solid #99b;
+}
+div.menu-panel a:link {
+}
+div.menu-panel a:hover {
+	border-left:		4px solid #66a;
+}
+
+/* ------------------------------------------------------------------------ */
+/*	Right column (main content panel)
+/* ------------------------------------------------------------------------ */
+#content-panel {
+	padding:			0;
+	margin:				0;
+	width:				100%;
+}
+
+/* ------------------------------------------------------------------------ */
+/*	Form styles
+/* ------------------------------------------------------------------------ */
+input[type="text"] {
+	border:				1px solid #99b;
+	background-color:	#99b;
+	color:				#fff;
+	font-size:			1.1em;
+}
+input[type="text"]:focus {
+	background-color:	#dde;
+	color:				#000;
+}
+input[type="submit"], input[type="reset"] {
+	border:				1px solid #99b;
+	background-color:	#99b;
+	color:				#fff;
+	font-size:			1.1em;
+	font-weight:		bold;
+}
+input[type="submit"]:hover, input[type="reset"]:hover {
+	color:				#000;
+	background-color:	#dde;
+}
+form.search {
+	padding:			0 0 0 8px;
+	margin:				0;
+}
+form.search input.text {
+	width:				70px;
+}
+form.search input.big-text {
+	width:				200px;
+}
+
+/* ------------------------------------------------------------------------ */
+/*	Table styles
+/* ------------------------------------------------------------------------ */
+td.item-head {
+/* A table header cell style.  The <td> element is not styled so as not to		*/
+/* cause unpredictable results with hard-coded tables from GNUMP3d's modules.	*/
+	font-size:			1.2em;
+	font-weight:		bold;
+	color:				#fff;
+	background-color:	#99b;
+}
+td.underline-links a {
+	text-decoration:	underline;
+}
+td.right {
+	text-align:			right;
+	font-size:			0.9em;
+	width:				80px;
+}
+td.right a {
+	text-decoration:	none;
+}
+td.right a:hover {
+	text-decoration:	underline;
+}
+
+table.items {
+/* This table class is used for most generic tables in the site.	*/
+	width:				100%;
+	font-size:			1.0em;
+	border:				2px solid #99b;
+	background-color:	#fff;
+	margin-bottom:		10px;
+	border-collapse:	collapse;
+}
+table.items tr.item:hover {
+	background-color:	#eef;
+}
+table.items td {
+	padding:			2px 8px;
+}
+table.items a {
+	color:				#000;
+	text-decoration:	none;
+}
+
+table.results {
+/* A table style used for the search results page, where much of the	*/
+/* table's internal html is predetermined by GNUMP3d, so cells cannot	*/
+/* be assigned their own CSS class.										*/
+	width:				100%;
+	font-size:			1.0em;
+	border:				2px solid #99b;
+	background-color:	#fff;
+	margin-bottom:		10px;
+	border-collapse:	collapse;
+}
+table.results tr:hover {
+	background-color:	#eef;
+}
+table.results tr.plain:hover {
+	background-color:	#fff;
+}
+table.results td {
+	padding:			2px 8px;
+}
+table.results a {
+	color:				#000;
+	text-decoration:	none;
+}
+
+table.items-bar {
+/* A table style with similar purpose to "table.results" above.	*/
+	width:				100%;
+	font-size:			1.0em;
+	border:				2px solid #99b;
+	background-color:	#fff;
+	margin-bottom:		10px;
+	border-collapse:	collapse;
+}
+table.items-bar tr:hover {
+	background-color:	#eef;
+}
+table.items-bar td {
+	padding:			2px 8px;
+}
+table.items-bar a {
+	color:				#000;
+	text-decoration:	none;
+	border-left:		4px solid #99b;
+	padding-left:		4px;
+}
+table.items-bar a:hover {
+	border-left:		4px solid #66a;
+}
+

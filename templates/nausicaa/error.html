@@ -1,0 +1,58 @@
+<html>
+<head>
+$META
+	<title>GNUMP3d [ $HOSTNAME : $DIRECTORY ]</title>
+	<link rel="stylesheet" href="/style.css" type="text/css">
+</head>
+
+<body>
+
+<table width="80%" align="center" border="0" cellpadding="2" bgcolor="#103060">
+	<tr>
+<td align="center" colspan="7">
+			<form action="/search" method="GET">
+			<span class="header">:: <A HREF="http://www.gnump3d.org/">GNUMP3d</a> Server v$RELEASE on <i>$HOSTNAME</i> ::
+  			<br>:: Music Search ::</span> <input TYPE="text" NAME="q" /> <input type="submit" value="Search" />
+			</form>
+		</td>
+	</tr>
+	<tr align="center" class="qlinks">
+		<td width="15%"><A HREF="/" title="Go to the root of the music archive">Home</A></td>
+		<td width="14%"><a href="/playlist/" title="Create a custom playlist">Custom Playlists</a></td>
+		<td width="14%"><a href="/prefs/" title="Change your preferences">Preferences</a></td>
+		<td width="14%"><A HREF="/stats/" title="See the most popular songs on this server">Most Popular</A></td>
+		<td width="14%"><A HREF="/recent/" title="See the last 20 tracks played">Most Recent</A></td>
+		<td width="14%"><A HREF="/search/" title="Search the repository for music">Search</A></td>
+		<td width="14%"><a href="/extras.html" title="Extra links">Extras</a></td>
+		<td width="15%"><A HREF="http://www.gnump3d.org/" title="Visit the official home of GNUMP3d">GNUMP3d Home</A></td>
+	</tr>
+</table>
+
+<table width="100%" border="0">
+<tr>
+
+<td valign="TOP">
+
+<p>&nbsp;</p>
+
+<table border="0" cellpadding="0" cellspacing="2" width="100%" bgcolor="#001040">
+<tr>
+	<td>
+		<table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#32537C">
+			<tr bgcolor="#183868">
+				<td colspan="6" class="subtitle">Error</td>
+			</tr>
+			<tr>
+				<td>$ERROR_MESSAGE</td>
+			</tr>
+		</table>
+	</td>
+</tr>
+</table>
+
+</td>
+</tr>
+</table>
+
+</body>
+</html>

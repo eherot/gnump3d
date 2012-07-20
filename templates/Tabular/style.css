@@ -1,0 +1,153 @@
+<!--  This file was originally taken from Paul Crowleys
+     homepage, and is included here with consent. 
+
+      The original location was:
+
+	 http://www.ciphergoth.org/ciphergoth.css 
+
+      His site is a good read for people who like
+    Cryptography, and many other fine things, check it
+    out at:
+
+	 http://www.ciphergoth.org/
+
+ -->
+
+body {
+  background: white;
+  color: black;
+  margin-left: 3%;
+  margin-right: 3%; 
+}
+
+body.gl-index {
+  background: black;
+  color: white;
+  font-family: sans-serif;  
+}
+
+:link { color : #E00 }
+:visited { color: #800 }
+
+a:hover { background: #FFE }
+a:active { color: black; background: #FFC }
+
+.navt, .navb { 
+  background: #FEE; 
+  padding: 0.2ex 1em 0.6ex 1em;
+}
+
+.navt {
+  border-top: medium solid #800;
+}
+
+.navb {
+  border-bottom: medium solid #800;
+}
+
+.bigtitle {
+  background: black;
+  padding: 0.5ex 5% 0.5ex 5%;
+}
+
+.bigtitle h1 {
+  color: white;
+}
+
+.box, .abstract {
+  border-left: thin solid #008;
+  border-right: thin solid #008;
+  border-top: medium solid #008;
+  border-bottom: medium solid #008;
+}
+
+.box {
+  background: #EEF;
+  color: black;
+  padding: 1ex 5% 1ex 5%;
+}
+
+dt {
+  margin-top: 1ex;
+  font-weight: bold;
+}
+
+dl.strongdt dt {
+  font-family: sans-serif; 
+  font-size: larger;
+}
+
+h1 {
+  text-align: center; 
+}
+
+h1, h2, h3, h4 {
+  font-family: sans-serif;
+  color: #008
+}
+
+.authors { text-align: center }
+
+.cite, .abstract {
+  margin-left: 15%;
+  margin-right: 15%;
+}
+
+.cite {
+  font-size: smaller;
+}
+
+.abstract {
+  text-align: justify;
+  padding: 2ex 1.5em 2ex 1.5em ;
+}
+
+table.twocolumn tr td { vertical-align: top; width: 50% }
+
+
+/* ============================================== */
+
+body.gl {
+  background: black;
+  color: white;
+}
+
+body.gl h1 {
+  color: white;
+}
+
+body.gl :link { color : #EEE }
+body.gl :visited { color: #999 }
+body.gl :hover { background: inherit }
+body.gl :active { color: #FFF }
+
+body.gl .navt, body.gl .navb {
+    background: black;
+    border-top: thin solid white;
+    border-bottom: thin solid white;
+}
+
+table.gl-main {
+  margin-top: 5ex;
+  margin-bottom: 5ex;
+}
+
+table.gl-main, table.gl-navbuttons, table.gl-index {
+  font-weight: bold;  
+}
+
+table.gl-main, table.gl-navbuttons, table.gl-index, td.gl-button table {
+  font-weight: bold;  
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.postinfo {
+  background: #EEF;
+}
+
+.keywords {
+  font-size: smaller;
+  font-weight: bold;
+}

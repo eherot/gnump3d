@@ -1,0 +1,269 @@
+.\" te.de Id
+.\" .ds Dt \\$4
+.\" ..
+.\" .Id 2.0
+.\" .ds = \-\^\-
+.\" .de Sp
+.\" .if t .sp .3
+.\" .if n .sp
+.\" ..
+.\" .ta 3n
+.TH "gnump3d.conf" "1" "\*(Dt" "GNU" ""
+.SH "NAME"
+GNUMP3d \- GNU MP3 / OGG Vorbis Streaming Server
+.SH "SYNOPSIS"
+.Sp 
+.B gnump3d
+is a simple server allows you to stream MP3's, and OGG Vorbis files across a network.  The operation of this server is controlled by the configuration file
+.B gnump3d.conf
+which is described within this man page.
+.Sp 
+By default the configuration file lives in 
+.B /etc/gnump3d/gnump3d.conf
+but the server may instead read the personal configuration file
+.B 
+~/.gnump3drc
+.Sp 
+The personal configuration file will take precedence if it exists when the server is started.
+
+
+
+.SH "CONFIG FORMAT"
+The format of the configuration file is very straightforward, each line is either a comment, which is a line beginning with '#', or a line of the format:
+.Sp 
+\fBkey = value\fP
+.Sp 
+
+  Configuration values may be split across multiple lines if each line is terminated with '\\'.  For example the following two examples are perfectly valid:
+
+.Sp 
+\fBsome_key = \\ .br 
+.Sp 
+\fBsome_value\fP
+.Sp 
+
+.Sp 
+\fBsome_key = some really long \\.br 
+.Sp 
+\fBvalue\fP
+.Sp 
+
+.SH "IMPORTANT OPTIONS"
+The important options you'll need to set are 'root', 'port', and 'user'.  Other values are optional, and have sensible defaults if they are not set.
+
+.Sp
+\fBadd_meta_tag\fP
+.Sp
+This allows you to insert your own META-tag into the output of each of the pages, useful for setting up the encoding type of the pages, for example.
+
+.Sp 
+\fBadvanced_playlists\fP
+.Sp 
+.Sp
+  This value toggles the use of advanced playlists, when it is set to '1' then extra information is included inside the playlists so that XMMS and WinAMP will display song tag information in the playlist windows.
+
+.Sp 
+\fBallowed_clients\fP
+.Sp 
+  This value allows you to set client IP addresses which are always allowed to connect to your server.  This is the logical counterpart to 'denied_clients'.
+
+\fBalways_stream\fP
+.Sp 
+  When the server builds up links to files there are two ways they can be formed, a straight link to the file, or a link to a playlist containing that file.
+  The two are subtly different.  When a playlist is formed, via 'always_stream=1' the song may begin playing immediately, without this the file will typically be downloaded in its entirity to the client and then played.
+  It is recommended this opt
+
+\fBbinding_host\fP
+.Sp 
+  If your machine has multiple ethernet interfaces then this setting will allow you to control which interface the server listens upon.
+
+\fBdirectory_format\fP
+.Sp 
+  This is a format string which is documented within the configuration file itself; it allows you to specify a template which will be used in the output file for each directory name which is found.
+
+\fBdefault_quality\fP
+.Sp
+  When you enable the downsampling support your clients may choose their own bitrates via the preferences page; by using this setting you can setup their default quality level.  Note that if they choose their own setting that will take precedence.
+
+\fBdownsample_enabled\fP
+.Sp
+  The server enables visiting clients to select the bitrate which they wish to receive their music at.  
+  If this option is disabled then all clients will receive unadulterated music, and the downsampling options of high, medium, and low quality will be removed from their preference page.
+
+\fBdownsample_high_mp3\fP
+\fBdownsample_medium_mp3\fP
+\fBdownsample_low_mp3\fP
+\fBdownsample_high_ogg\fP
+\fBdownsample_medium_ogg\fP
+\fBdownsample_low_ogg\fP
+.Sp
+  For each of the quality levels that users may select these options are used to control the command that the music served is passed through.
+  For example if the visiting client wishes to hear their music at 'medium' quality then the tracks they listen to will be piped through the command specified in the 'downsample_medium_mp3' setting.
+  Each of the commands is assumed to read input from the filename which is automatically appended to the command chosen, and to produce output to STDOUT.
+  For a null setting you can use:
+
+   downsample_high_mp3 = /bin/cat
+
+
+\fBenable_browsing\fP
+.Sp 
+  This value allows you to disable browsing your servers GUI interface.  This would be ideal if you just wished your clients to be restricted to random playing of songs.
+
+\fBenable_password_protection\fP
+.Sp 
+  Password protection is enabled by default, with this option you may disable it.
+  Password protection requires that you place a file '.password' within each directory you wish to restrict access to.  This file contains lines of the form 'username:password'.
+
+\fBerrorlog\fP
+.Sp 
+  The name of the file to write all error messages to.  When the server is ran in debug mode (with '\-\-debug' specified upon the command line) this file is not used, instead the output is sent to the console.
+
+\fBfile_format\fP
+.Sp 
+  This is a format string which is documented within the configuration file itself; it allows you to specify a template which will be used to generate the output for each file which is found.
+
+\fBhide_song_tags\fP
+.Sp
+  If your archive doesn't contain sensible tags, or you just wish to disable this functionality then you may specify 'hide_song_tags = 1' in your configuration file, and these tags will be ignored.
+
+\fBhostname\fP
+.Sp 
+  The hostname setting allows you to control the hostname which is used in all the generated links within the GUI.  It may be useful if the server has multiple DNS names.
+
+\fBindex_program\fP
+.Sp
+  This is the path to the gnump3d index program - it's configurable primarily so that it may be invoked under Windows.
+
+\fBjukebox_mode\fP
+.Sp
+  This is an experimental mode whereby all the songs that users select are played back upon your GNUMP3d server - and not streamed at all.  It's not been tested very much and is included purely to demonstrate that such a thing is possible.  It may disappear with no notice unless there is sufficient interest in it.  
+  Set this to '1' to enable it, but be sure to set 'jukebox_player' to point to an appropriate playback binary.
+
+\fBjukebox_player\fP
+.Sp
+  This is the setting which must point to a command line MP3/Ogg player if you wish the jukebox mode to work.  The binary here is exec'd by the server with the permissions of the server, and is assumed to play the single song it is given upon the command line, then exit.
+
+\fBlogfile\fP
+.Sp 
+  The name of the file to write all accesses to.  The logfile is written in the Apache common logfile format \- so it may be analysed by common tools, including the 
+.B gnump3d\-top
+script.
+
+  Note that if your server is running under an assumed user, (see 'user' above), that user must have permission to read the logfile if you want statistics to be visible to clients.
+
+\fBlog_format\fP
+.Sp
+  This is a format string which controls how things are written to our logfile.  This allows the format to be changed to include any of the shared variables, if the current logging is insufficient.
+
+\fBmime_file\fP
+.Sp 
+  As part of it's role the server is a fully featured HTTP server, which is capable of serving, or streaming, audio and video files.  To set the type of file correctly when serving it a registry is used.
+  The mime.types file is that registry, and this setting should be used to point to the file you're using.
+
+\fBnew_format\fP
+.Sp
+  This string can be inserted into the display next to new directories if they contain recently modified files.
+
+\fBnew_days\fP
+.Sp
+ If a directory hasn't been modifed in more than 'x' days then it isn't considered 'new'.  Default is a week.
+
+\fBnow_playing_path\fP
+.Sp
+  In order to record which songs are currently being played the server will create a temporary file containing that path of each file that it is serving.
+  The path under which these files are created in may be set here.
+
+\fBplay_all_text\fP
+.Sp 
+  This setting contains the text which is displayed for the 'play all' links.
+
+\fBplay_recursively_text\fP
+.Sp 
+  This setting controls the text which is displayed for the recursive playlist links.
+
+\fBplugin_directory\fP
+.Sp 
+  When the server is installed upon your system a collection of plugins are also installed, as some of these represent core features of the server.  This setting allows you to tell the server where these plugins are located upon your system.  (This should be set by the installation script).
+
+\fBport\fP
+.Sp 
+  The port upon which the server listens, this may be any port which is not already in use upon your machine.
+
+\fBrecursive_randomize\fP
+.Sp 
+  This option controls whether recursive playlists are randomized, or sent in filename order.
+
+\fBread_time\fP
+.Sp 
+  This setting controls how long the server should listen for a request from incoming clients.  The default of 10 seconds should be sufficient.
+
+\fBroot\fP
+.Sp 
+  The root directory where the media content is served from.  This should be the directory containing the MP3/OGG/Movie files which you wish to share.
+.Sp 
+  Note that if your server is running under an assumed userid, (see the 'user'configuration value), then that user must have permission to read the files in the root directory.
+
+
+\fBshoutcast_streaming\fP
+.Sp 
+  If this setting is enabled then shoutcast meta data will be mixed in with any songs which are streamed.
+
+
+\fBsong_format\fP
+.Sp 
+  This is another template string which is used to control what information is displayed for audio files, (for example the name of the song, or the name and artist of a song).  More details are found in the configuration file.
+
+\fBsort_order\fP
+.Sp 
+ This setting allows you to control the order in which songs are listed upon the index pages.  This is especially useful within directories which contain a large number of files.
+
+\fBstats_program\fP
+.Sp 
+  This option allows you to specify the path to the companion program
+<b>gnump3d\-top
+ which is used to present a list of the most common, and popular requests the server receives.  By default this isn't needed as the script is installed in the same location as the main program.
+
+\fBstats_arguments\fP
+.Sp 
+  This option allows you to specify additional options to pass to the 
+<b>gnump3d\-top
+  program when it is invoked by the server, see the man page for that program for more details of supported options.
+
+\fBdisable_tag_cache\fP
+.Sp
+  When this is enabled the tag cache functionality will be disabled, and
+ filenames only will be disabled.
+
+\fBtag_cache\fP
+.Sp 
+  As an optimization the song tags read from files upon the disk are cached after being read for the first time.  This setting controls the file where these tag details are cached to.
+
+\fBtheme\fP
+.Sp 
+  The servers appearance may be changed by use of a collection of template files, these are known as themes.  This option allows you to specify which theme is presented by default.  (Clients may choose their own theme via the preferences user interface).
+
+\fBtheme_directory\fP
+.Sp 
+  The directory where the themes exist may be specified here, if you're installing the software in an unusual configuration.
+
+\fBtruncate_log_files\fP
+.Sp 
+  When the server starts it normally appends all new logging information to the existing logfiles which might be present.  With this setting you may force the server to truncate the files first.
+
+\fBuse_client_host\fP
+.Sp 
+  This setting controls whether the client's 'Host:' header will be used, if it is sent.  This can be useful if you're performing SSH tunelling operations, or working on a server with more than one hostname.
+
+\fBuser\fP
+.Sp 
+  If there is a user value specified then the server will become that user, after creating the listening socket.  This is important for security reasons.  However please ensure that the user the server becomes once starting has read and execute permissions for the directory containing your music archive, and write permissions for the logfiles you choose.
+\fBvalid_referrers\fP
+.Sp
+  This is an experimental feature which is designed to limit access to your site by the Referrer of the clients browser.  This is probably doomed to failure as the referrer may be spoofed with ease.
+
+.SH "AUTHOR Steve Kemp <steve@steve.org.uk>"
+
+.SH "SEE ALSO"
+.BR gnump3d (1),
+.BR gnump3d\-top (1)
+

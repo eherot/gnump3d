@@ -1,0 +1,98 @@
+
+gnump3d downsampling
+--------------------
+
+  GNUMP3d is pretty flexible when it comes to server media files, if you 
+ wish each file type supported can be processed by an arbitary program.
+
+  This allows you to perform on the fly bitrate changing, which can
+ be useful for streaming media from a home machine to your place of
+ work - for example.
+
+
+Enabling
+--------
+
+  The configuration file /etc/gnump3d/gnump3d.conf has a single 
+ setting which is responsible for the enabling or disabling of 
+ this support.
+
+  To enable it ensure you have the following line, uncommented:
+
+# Enable downsampling.
+downsample_enabled = 1
+
+  If this is disabled the GUI will not show any downsampling options
+ and all the other settings are ignored.
+
+
+
+Specifying Filter Programs
+--------------------------
+
+  If the downsampling is enabled then the server will attempt to 
+ stream the files through a filter, for the correct quality.
+
+  The filters are setup in terms of the suffix of the media file.
+ This means that you may have a different program downsampling
+ MP3 and OGG files.
+
+  The general setup involves having three lines of the form:
+
+downsample_"level"_"suffix"
+
+  For example:
+
+downsample_high_mp3   = /usr/bin/lame  --mp3input -b 56 $FILENAME -
+downsample_medium_mp3 = /usr/bin/lame  --mp3input -b 32 $FILENAME -
+downsample_low_mp3    = /usr/bin/lame  --mp3input -b 16 $FILENAME -
+
+  These lines will specify the command that all MP3 files are passed
+ through at the given quality level.
+
+  (The file suffixes are treated case insensitively).
+
+
+
+
+Controlling Downsampling
+------------------------
+
+  Downsampling is controlled by the IP address of the client which
+ requests a song.
+
+  This is deliberate as the server is mostly designed for use on
+ a LAN; so all the local machines will be expected to have the
+ full quality songs, and any remote machines will be downsampled.
+
+  To control the downsampling you will need to adjust *both* of
+ the following settings:
+
+
+downsample_clients    = XXX
+no_downsample_clients = YYY
+
+  Valid values are either 'all', 'none' or a range of IP addresses, such 
+ as '192.168.0/24'.  Multiple values may be seperated by ';' characters.
+
+  A typical setup would look like this:
+
+
+#
+#  Downsample for all clients
+#
+downsample_clients = all
+
+#
+#  EXCEPT local ones
+#
+no_downsample_clients = 192.168.0/24; 127.0.0.1
+
+  
+  As you can see 'no_downsample_clients' takes precedence over the
+ first setting.
+
+Steve
+--
+
+  

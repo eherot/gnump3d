@@ -1,0 +1,69 @@
+#!/bin/sh
+
+# this file is /etc/init.d/gnump3d
+
+# chmod 744 /etc/init.d/gnump3d
+# ln -s /etc/init.d/gnump3d /etc/init.d/rc3.d/S40gnump3d
+# ln -s /etc/init.d/gnump3d /etc/init.d/rc3.d/K04gnump3d
+
+
+# Making GNUMP3d chroot:                 (comments to daniel@troeder.de)
+# ======================                 -------------------------------
+# I have all my publicly accesible MP3s in /home/pub/ftp/pub/mp3 because
+# /home/pub/ftp is the root for my ftp-tree. You'll need to modify this 
+# script to your needs.
+# I define GNUMP3ds root as "root = /pub/mp3" and chroot it into 
+# "/home/pub/ftp". Further more I use "user = nobody" and 
+# "logfile = /var/log/mp3d.log".
+# This "/var/log" directory is in reality at "/home/pub/ftp/var/log".
+# The user nobody needs to be in "/home/pub/ftp/etc/passwd".
+# This should do it:
+# echo `grep nobody /etc/passwd` >> /home/pub/ftp/etc/passwd
+# In "/home/pub/ftp/lib" need to be (at least) the following files:
+# ld-linux.so.2  libc.so.6  libnss_files.so.2  libpthread.so.0
+# The actual versions depend on your installation.
+# I put mp3d into "/home/pub/ftp/bin", and 
+# move /etc/mp3d* to /home/pub/ftp/etc.
+#
+#
+# Some portions of this script are SuSE (www.suse.com) specific.
+# Just comment the lines where "# comment" is at the end, if you do
+# not use SuSE Linux.
+#
+#this is SuSE-specific:
+
+. /etc/rc.config                                   # comment
+
+# it defines $rc_done and $rc_failed as some fancy green "done" and 
+# gloomy red "failed" :-)
+# substitute it with the stuff your distribution does at startup
+#
+# You may not have the program "checkproc" which looks for running 
+# processes. Then just don't use the status option.
+
+
+case "$1" in
+    start)
+        return=$rc_done                            # comment
+        echo -n "Starting GNUMP3d Streaming MP3 Server:"
+        chroot /home/pub/ftp gnump3d --quiet &
+        echo -e "$return"                          # comment
+        test "$return" = "$rc_done" || exit 1      # comment
+        exit 0
+        ;;
+    stop)
+        return=$rc_done
+        echo -n "Stopping GNUMP3d Streaming MP3 Server:"
+	killall gnump3d || return=$rc_failed         # comment before "||"
+        test "$return" = "$rc_done" || exit 1     # comment
+        exit 0
+        ;;
+    status)                                       # ignore
+        echo -n "Checking for GNUMP3d Streaming MP3 Server: "
+        checkproc gnump3d && echo OK || echo No process
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|status}"
+        exit 1
+        ;;
+esac

@@ -1,0 +1,135 @@
+<html>
+<head>
+$META
+	<title>GNUMP3d [ Search ]</title>
+	<link rel="stylesheet" href="/style.css" type="text/css">
+</head>
+
+<body onLoad="document.forms.searchform.q.focus();">
+
+<table width="80%" align="center" border="0" cellpadding="2" bgcolor="#103060">
+	<tr>
+<td align="center" colspan="7">
+			<form action="/search/" method="GET">
+			<span class="header">:: <A HREF="http://www.gnump3d.org/">GNUMP3d</a> Server v$RELEASE on <i>$HOSTNAME</i> ::
+  			<br>:: Music Search ::</span> <input TYPE="text" NAME="q" /> <input type="submit" value="Search" />
+			</form>
+		</td>
+	</tr>
+	<tr align="center" class="qlinks">
+		<td width="15%"><A HREF="/" title="Go to the root of the music archive">Home</A></td>
+		<td width="14%"><a href="/playlist/" title="Create a custom playlist">Custom Playlists</a></td>
+		<td width="14%"><a href="/prefs/" title="Change your preferences">Preferences</a></td>
+		<td width="14%"><A HREF="/stats/" title="See the most popular songs on this server">Most Popular</A></td>
+		<td width="14%"><A HREF="/recent/" title="See the last 20 tracks played">Most Recent</A></td>
+		<td width="14%"><A HREF="/search/" title="Search the repository for music">Search</A></td>
+		<td width="14%"><a href="/extras.html" title="Extra links">Extras</a></td>
+		<td width="15%"><A HREF="http://www.gnump3d.org/" title="Visit the official home of GNUMP3d">GNUMP3d Home</A></td>
+	</tr>
+</table>
+
+<table width="100%" border="0">
+<tr>
+
+<td valign="TOP">
+
+<p>&nbsp;</p>
+<form action="/search/" method="GET">
+<table border="0" cellpadding="0" cellspacing="2" width="100%" bgcolor="#001040">
+<tr bgcolor="#103060">
+	<td>
+		<table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#32537C">
+			<tr bgcolor="#183868">
+				<td colspan="2" align="center" class="subtitle">Search Archive For Music</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+			</tr>
+			<tr>
+				<td align="RIGHT">Search Terms:&nbsp;</td>
+				<td align="LEFT"><input TYPE="text" NAME="q" SIZE="40" /></td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+			</tr>
+<tr><td align="right">Search for:</td><td align="left">
+ <input type="radio" name="type" value="all" checked> All Terms
+ <input type="radio" name="type" value="any"> Any Terms
+</td></tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+			</tr>
+			<tr><td align="right">Search artist:</td><td align="left"><input type="text" name="artist" size="40" /></td></tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+			</tr>
+
+<tr><td align="right">Search album:</td><td align="left"><input type="text" name="album" size="40" /></td></tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+			</tr>
+
+<tr><td align="right">Search song:</td><td align="left"><input type="text" name="title" size="40" /></td></tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+			</tr>
+
+<tr><td align="right">Search year:</td><td align="left"><input type="text" name="year" size="40" /></td></tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+			</tr>
+
+			<tr>
+				<td align="right">Start Directory:&nbsp;</td>
+				<td align="left">$SELECT_COMBO</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+			</tr>
+			<tr>
+				<td align="right">Genres:&nbsp;</td>
+				<td align="left">$GENRE_COMBO</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+			</tr>
+			
+			<tr>
+				<td align="right">Play Results:&nbsp;</td>
+				<td align="left">
+					<input type="radio" name="play" value="0" checked> No</input>
+					<input type="radio" name="play" value="1"> Yes</input>
+				</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+			</tr>
+			<tr>
+				<td colspan="2" align="center"><input TYPE="submit" value="Search Archive" /></td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+			</tr>
+		</table>
+	</td>
+</tr>
+</table>
+</form>
+
+
+</td>
+</tr>
+</table>
+
+</body>
+</html>

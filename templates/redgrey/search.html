@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "DTD/xhtml11-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+$META
+ <title>GNUMP3d [ $HOSTNAME : $DIRECTORY ]</title>
+ <style type="text/css">
+   body {font-family: arial, sans-serif; color: black; background-color: gray;}
+   td.title {color: gray; font-weight:bold; height:30px}
+
+   :link { color : #808;  }
+   :visited { color: #800; text-decoration: none; }
+
+   a.top:visited {color: #800; font-weight: bold; text-decoration: none; }
+   a.top:link {color: #A00; font-weight: bold; text-decoration: none; }
+  </style>
+
+</head>
+
+<body bgcolor="white" onLoad="document.forms.searchform.q.focus();">
+
+<!-- include="header.tmpl" -->
+
+
+<form action="/search/" method="get">
+<table border="0" cellpadding="2" cellspacing="0" width="100%" bgcolor="#eaecef">
+<tr><td colspan="2" align="center" class="title">Search Archive For Music</td></tr>
+<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td align="right">Search Terms:</td><td align="left"><input type="text" name="q" size="40" /></td></tr>
+<tr><td align="right">Search for:</td><td align="left">
+ <input type="radio" name="type" value="all" checked> All Terms
+ <input type="radio" name="type" value="any"> Any Terms
+</td></tr>
+<tr><td align="right">Search artist:</td><td align="left"><input type="text" name="artist" size="40" /></td></tr>
+<tr><td align="right">Search album:</td><td align="left"><input type="text" name="album" size="40" /></td></tr>
+<tr><td align="right">Search song:</td><td align="left"><input type="text" name="title" size="40" /></td></tr>
+<tr><td align="right">Search year:</td><td align="left"><input type="text" name="year" size="40" /></td></tr>
+<tr><td align="right">Start Directory:</td><td align="left">$SELECT_COMBO</td></tr>
+<tr><td align="right">Genres:</td><td align="left">$GENRE_COMBO</td></tr>
+<tr><td align="right">Play Results:</td><td align="left">
+ <input type="radio" name="play" value="0" checked> No
+ <input type="radio" name="play" value="1"> Yes
+</td></tr>
+<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td><input type="submit" /></td></tr>
+<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+</table>
+</form>
+
+
+<p align="center">
+[ <a href="http://www.gnump3d.org/">GNUMP3d</a> | 
+<a href="http://www.gnump3d.org/FAQ.html" title="View this software's Frequently Asked Questions - with answers!">FAQ</a>
+]
+</p>
+
+</body>
+</html>
+
+

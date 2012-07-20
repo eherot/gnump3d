@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+$META
+<title>Musicus :: $TITLE </title>
+
+<style type="text/css">
+	body {margin: 0;
+	padding: 0;
+	background: #BAB4CC;
+	font: 1em/1.7em arial, sans-serif; }
+
+	pre {text-indent: 30px;}
+
+
+	#content {background: #BAB4CC;
+	font: 0.8em "Trebuchet MS", arial, sans-serif;
+	height: auto;
+	text-align: justify;
+	padding: 100px 70px 0px 70px;
+	z-index: 0;}
+
+	#content a {text-decoration: none;
+	color: #762D86;}
+
+	#content a:hover {background: #9D9FC0;}
+	#banner {
+		position: absolute;
+		top: 0;
+		left: 0;
+		height:50px;
+		width: 100%;
+		padding: 0;
+		margin: 0 1px;
+		border: 3px solid #704080;
+		border-bottom-color:#503060;
+		border-right-width:0px;
+		border-left-width:0px;
+		border-top-width:0px;
+		color: #AA80FF;
+		background: #9B85AD;
+		z-index: 5;
+	}
+	body>#banner {position: fixed;}
+
+	#banner h1 {margin: 0;
+	padding: 5px;}
+
+	#tabmenu {color: #000;
+	position: absolute;
+	top: 49;
+	padding: 0px;
+	z-index: 10;
+	margin-left: 9px;}
+	body>#tabmenu {position: fixed; top: 31px;}
+	head:first-child+body #tabmenu {top: 33px;} /*only mozilla*/
+
+	#tabmenu li {display: inline;
+	overflow: hidden;
+	list-style-type: none;}
+
+	#tabmenu a, a.active {
+		color: #AA99BA;
+		background: #795E8B;
+		font-size: 0.8em;
+		font-weight: bold;
+		border: 2px solid #503060;
+		border-top-width:1px;
+		border-top-color:#644074;
+		border-bottom-color:#503060;
+		border-right-color:#503060;
+		border-left-color:#9060A0;
+		padding: 2px;
+		margin: 2px;
+		text-decoration: none;
+	}
+
+	#tabmenu a.active {
+		color: #DECFDE;
+		background: #9B85AD;
+		border-top: 3px solid #9B85AD; z-index: 30;
+		border-top-width:4px;
+		border-top-color:#9B85AD;
+		border-bottom-color:#704080;
+		border-right-color:#704080;
+		border-left-color:#D080D0;
+	}
+
+
+	/*#tabmenu a:visited {color: #E8BEE9;}*/
+
+	#tabmenu a.active:hover {
+		background: #9B85AD;
+	}
+	#tabmenu a:hover {
+		color: #DDAAFF;
+	}
+	.mainlist{
+		border: 4px solid #9B85AD;
+		border-bottom-color:#DECFDE;
+		border-top-color:#9B85AD;
+		border-left-color:#9B85AD;
+		border-right-color:#DECFDE;
+	}
+	.mainlistinner{
+		border: 1px solid #9B85AD;
+		border-top-color:#704080;
+		border-left-color:#503060;
+		border-bottom-color:#9B85AD;
+		border-right-color:#9B85AD;
+	}
+</style>
+
+</head>
+
+<body>
+
+<div id="banner">
+<h1>Musicus</h1>
+</div>
+
+<ul id="tabmenu">
+<li><a href="/">Music</a></li>
+<li><a href="/tagbrowse">Browse by Tag</a></li>
+<li><a href="/playlist/">Custom Playlist</a></li>
+<li><a href="/random">Random Selection</a></li>
+<li><a href="/random/directory">Random Directory</a></li>
+<li><a href="/prefs/">Preferences</a></li>
+<li><a href="/search/">Search</a></li>
+<li><a href="/statistics.html">Statistics</a></li>
+<li><a href="/extras.html">Extras</a></li>
+</ul>
+
+<div id="content">
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%" class=mainlist>
+<tr><td>
+<table border="0" cellpadding="10" cellspacing="0" width="100%" bgcolor="#EAEFEC" class=mainlistinner>
+<tr bgcolor="#D1D7D5"><td colspan="7" align="center"><h3>$HEADING</h3></td></tr>
+<tr><td>
+$TEXT
+</td></tr>
+</table>
+</td></tr>
+</table>
+
+<!-- include="footer.tmpl" -->
+

@@ -1,0 +1,361 @@
+td {
+	font-size: 12px;
+}
+
+a:link,a:visited {
+        color:#000000;
+	text-decoration:none;
+}
+
+a:hover {
+        color:#ff0000;
+        text-decoration:none;
+}
+
+body{
+	font-size: 12px;
+	font-family: Trebuchet MS,arial,helvetica;
+	background:url('bck.gif');
+}
+
+.footer {
+	width:100%;
+	font-size: 12px;
+	font-family: Trebuchet MS,arial,helvetica;
+}
+
+.form {
+	font-style: normal;
+	font-size: 12px;
+	font-family: Trebuchet MS,arial,helvetica;
+	border:1px solid #cccccc;
+	background:url('bck.gif');
+	background-color: #ffffff;
+	text-align:right;
+}
+
+.input, input, textarea  {
+	font-style: normal;
+	font-size: 14px;
+	font-weight: normal;
+	font-family: Trebuchet MS,arial,helvetica;
+	border-style: inset;
+	border-width: 1pt;
+	background-color: #F6F6F6;
+}
+select {
+	font-family:Trebuchet MS,arial,helvetica;
+	font-size: 14px;
+	background-color: #F8FAFA;
+	border-width: 1pt;
+	border-style: inset;
+	padding-left: 2px;
+}
+
+.button  {
+	font-style: normal;
+	font-size: 12px;
+	font-weight: normal;
+	font-family: Trebuchet MS,arial,helvetica;
+	border-style: outset;
+	border-width: 1pt;
+	background-color: #F6F6F6;
+}
+
+.pageTabOff,.pageTabOff a:link,.pageTabOff a:visited {
+	text-decoration:none;
+	color:#0000ff;
+	font-family:Trebuchet MS,arial,helvetica;
+	font-size:14px;
+	text-align:center;
+}
+.pageTabOn,.pageTabOff a:hover {
+	text-decoration:underline;
+	font-family:Trebuchet MS,arial,helvetica;
+	font-size:14px;
+	text-align:center;
+}
+
+.boxedBox {
+	border-right:1px solid #a0a0a0;
+	border-left:1px solid #a0a0a0;
+	border-bottom:1px solid #a0a0a0;
+}
+.boxedMessage {
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:14px;
+        font-weight:normal;
+	background-color:#ffffff;
+	color:#000000;
+}
+.boxedMessage a:link,.boxedMessage a:visited {
+	color:#0000ff;
+}
+.boxedHead {
+	background:url('tabel-header-middle-white.gif');
+	font-family:Trebuchet MS,arial,helvetica;
+        font-size:14px;
+        font-weight:bold;
+	color:#707070;
+	height:22px;
+}
+
+.smallText {
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:10px;
+        font-weight:normal;
+}
+.normalText {
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:14px;
+        font-weight:normal;
+}
+.bigText {
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:16px;
+        font-weight:normal;
+}
+
+.tabLineOn{
+	background-color:#dddddd;
+	width:84px;
+	height:1px;
+}
+.tabLineOff{
+	background-color:#9c9c9c;
+	width:84px;
+	height:1px;
+}
+
+.mainTabOff{
+	background:url('tab-white-act.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:14px;
+        font-weight:normal;
+	color:#c0c0c0;
+	width:84px;
+	height:24px;
+}
+.mainTabOff a:link,.mainTabOff a:visited {
+	color:#909090;
+}
+.mainTabOff a:hover {
+	color:#303030;
+}
+.mainTabHigh {
+        background:url('tab-white-mo.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:14px;
+        font-weight:normal;
+	width:84px;
+}
+.mainTabOn0 {
+        background:url('tab-athrazite-act.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:14px;
+        font-weight:normal;
+	width:84px;
+}
+.mainTabOn1 {
+        background:url('tab-ruby-act.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:14px;
+        font-weight:normal;
+	width:84px;
+}
+.mainTabOn2 {
+        background:url('tab-tangerine-act.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:14px;
+        font-weight:normal;
+	width:84px;
+}
+.mainTabOn3 {
+        background:url('tab-yellow-act.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:14px;
+        font-weight:normal;
+	width:84px;
+}
+.mainTabOn4 {
+        background:url('tab-lime-act.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:14px;
+        font-weight:normal;
+	width:84px;
+}
+.mainTabOn5 {
+        background:url('tab-turqois-act.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:14px;
+        font-weight:normal;
+	width:84px;
+}
+.mainTabOn6 {
+        background:url('tab-aqua-act.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:14px;
+        font-weight:normal;
+	width:84px;
+}
+.mainTabOn7 {
+        background:url('tab-purple-act.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:14px;
+        font-weight:normal;
+	width:84px;
+}
+
+
+.subTabOn0 {
+        background:url('cel-bar-anthrazite-act.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:12px;
+        font-weight:normal;
+}
+.subTabOn1 {
+        background:url('cel-bar-ruby-act.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:12px;
+        font-weight:normal;
+}
+.subTabOn2 {
+        background:url('cel-bar-tangerine-act.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:12px;
+        font-weight:normal;
+}
+.subTabOn3 {
+        background:url('cel-bar-yellow-act.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:12px;
+        font-weight:normal;
+}
+.subTabOn4 {
+        background:url('cel-bar-lime-act.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:12px;
+        font-weight:normal;
+}
+.subTabOn5 {
+        background:url('cel-bar-turqois-act.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:12px;
+        font-weight:normal;
+}
+.subTabOn6 {
+        background:url('cel-bar-aqua-act.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:12px;
+        font-weight:normal;
+}
+.subTabOn7 {
+        background:url('cel-bar-purple-act.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:12px;
+        font-weight:normal;
+}
+
+
+.subTabOff0 {
+        background:url('cel-bar-anthrazite.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:12px;
+        font-weight:normal;
+}
+.subTabOff1 {
+        background:url('cel-bar-ruby.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:12px;
+        font-weight:normal;
+}
+.subTabOff2 {
+        background:url('cel-bar-tangerine.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:12px;
+        font-weight:normal;
+}
+.subTabOff3 {
+        background:url('cel-bar-yellow.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:12px;
+        font-weight:normal;
+}
+.subTabOff4 {
+        background:url('cel-bar-lime.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:12px;
+        font-weight:normal;
+}
+.subTabOff5 {
+        background:url('cel-bar-turqois.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:12px;
+        font-weight:normal;
+}
+.subTabOff6 {
+        background:url('cel-bar-aqua.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:12px;
+        font-weight:normal;
+}
+.subTabOff7 {
+        background:url('cel-bar-purple.gif');
+        font-family:Trebuchet MS,arial,helvetica;
+        font-size:12px;
+        font-weight:normal;
+}
+
+.topRow {
+	height:22px;
+	font-size:14px;
+	color: #0000ff;
+	background:url('tabel-header-middle-white.gif');
+}
+
+.topRow a:link,.topRow a:visited {
+	text-decoration:none;
+	font-family:Trebuchet MS,arial,helvetica;
+	font-size:14px;
+	color: #0000ff;
+	font-weight:normal;
+}
+.topRow a:hover {
+	text-decoration:underline;
+	color: #ff0000;
+}
+
+.listingTable {
+	width:98%;
+	border-right:1px solid #a0a0a0;
+	border-left:1px solid #a0a0a0;
+	border-bottom:1px solid #a0a0a0;
+}
+.darkRow td,.darkRow {
+	background-color:#efefef;
+	font-size:12px;
+	height:22px;
+}
+.lightRow td.lightRow {
+	background-color:#ffffff;
+	font-size:12px;
+	height:22px;
+}
+.darkRow a:link,.darkRow a:visited {
+	text-decoration:none;
+	font-family:Trebuchet MS,arial,helvetica;
+	font-size:12px;
+	height:22px;
+	color: #000000;
+}
+.lightRow a:link,.lightRow a:visited {
+	text-decoration:none;
+	font-family:Trebuchet MS,arial,helvetica;
+	font-size:12px;
+	height:22px;
+	color: #000000;
+}
+
+.lightText {
+	color:#c0c0c0;
+}

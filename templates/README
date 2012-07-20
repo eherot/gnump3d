@@ -1,0 +1,67 @@
+
+templates directory
+-------------------
+
+  This directory contains one subdirectory for every theme the server
+ includes.  The directory name is listed as the name of the theme in
+ the server preferences page.
+
+  Each theme is a simple collection of HTML files which are read and
+ used as templates for all the output pages.
+
+
+Markup
+------
+
+  The HTML files may contain special markup which includes variables
+ like:
+
+	$VERSION
+             To be replaced with the CVS version of the code.
+
+	$RELEASE
+             To be replaced with the release number of the code.
+
+	$HOSTNAME
+             The name of the machine the server is running upon.
+
+
+
+Inclusion
+---------
+
+  Also templates may include the output of external commands, or other
+ files, via a server-side-include syntax.  For example the following
+ are both valid lines:
+
+	<!-- include="header.tmpl" -->
+	<!-- exec="/bin/cmd arguments .." -->
+
+
+Theme Creation
+--------------
+
+  For more details of theme creation please study those included here,
+ or read the documentation online at the following URL:
+
+ 	http://www.gnump3d.org/documents.html
+
+
+Theme Specific Display
+----------------------
+
+  Themes may contain their own appearence in terms of the song and
+ directory format listings.
+
+  This is specified by copying the 'directory_format', and 'file_format'
+ from the gnump3d.conf and placing it inside a configuration file for
+ the theme.  This file must be called 'config.ini'.
+
+  Also for listing the theme creator the contents of the file AUTHOR
+ are displayed literally in the preferences page.
+
+
+Steve
+---
+www.gnump3d.org
+

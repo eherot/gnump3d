@@ -1,0 +1,51 @@
+
+GNUMP3d on Windows
+------------------
+
+  GNUMP3d was originally a Unix application, being written and tested
+ upon GNU/Linux.
+
+  Since the project has started there have been those who've wanted to
+ run it under Microsoft Windows platforms, without using anything like
+ the Cygwin Unix emulation layer.
+
+  Thanks to it's Perl nature the code should be very portable, and able
+ to run under most platforms; the trickiest issue is installation.
+
+
+Installation
+------------
+
+  Installing under Windows in 4 easy steps:
+
+
+   1. Download and install a recent version of Perl from ActiveState.
+
+   2. Unzip the gnump3d-2.x.zip file; and move the extracted directory
+      to C:\gnump3d2 - preserving any existing configuration file you
+      might have.
+
+   3. Make any changes to c:\gnump3d2\etc\gnump3d.conf.win.
+
+   4. Run c:\gnump3d2\bin\gnump3d-index.bat once.
+
+   4. Run 'C:\gnump3d\bin\run.bat', editing the location of your MP3s
+      if necessary, (the script assumes your music is in C:\MP3), and enjoy.
+  
+
+
+Problems?
+---------
+
+  If you have any problems please report them to the mailing list.
+
+  The archives and subscription information can be found at the following
+ URL:
+
+			http://www.gnump3d.org/lists.html
+
+
+
+Steve
+---
+www.gnump3d.org

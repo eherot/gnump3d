@@ -1,0 +1,16 @@
+
+rcfiles/
+
+  This directory contains startup/init scripts for different
+ Unix systems.
+
+  They are not officially supported, but included here in case
+ they may be useful.
+
+  For details of the Mac OS X tarball please refer to the 
+ README.MacOSX file in the parent directory.
+
+
+Steve
+---
+www.gnump3d.org

@@ -1,0 +1,65 @@
+        body {
+        font-family:Trebuchet MS, verdana, arial, sans-serif;
+        color:#666;
+        font-size:11px;
+        font-weight:normal;
+        background:blanchedalmond;
+        line-height:20px;
+        padding-left:10px;
+        padding-right:10px;
+        padding-top:1px;
+        width: 90%;
+	background-image: url("/bg.gif");
+	background-attachment: fixed;
+	background-position: top left;
+        }
+
+        a.dir:visited {
+        font-family:Trebuchet MS, verdana, arial, sans-serif;
+        font-size: 11px;
+        text-decoration: none;
+	color: green;
+        }
+
+        a.dir {
+        font-family:Trebuchet MS, verdana, arial, sans-serif;
+        font-size: 11px;
+        text-decoration: none;
+	color: red;
+        }
+
+        table.top {
+        font-family:Trebuchet MS, verdana, arial, sans-serif;
+        font-size: 11px;
+        text-decoration: none;
+        }
+
+        td.title {
+	background-color: yellow; color: gray; font-weight:bold; height:10px;
+	}
+
+        td {
+        font-family:Trebuchet MS, verdana, arial, sans-serif;
+        font-size: 11px;
+        text-decoration: none;
+        color:#666;
+        }
+
+	a {
+	font-family:Trebuchet MS, verdana, arial, sans-serif;
+	color: #093;
+	font-size: 12px;
+	text-decoration: none;
+	}
+
+        table.dashed { 
+        font-family:Trebuchet MS, verdana, arial, sans-serif;
+        font-size: 11px;
+        text-decoration: none;
+        color:#666;
+	border: 1px dotted 
+	}
+
+        a.gnump3d {color: #939393; ; font-weight: bold;}
+
+        legend {font-weight: bold; color: green; }

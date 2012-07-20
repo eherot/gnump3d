@@ -1,0 +1,47 @@
+#!/bin/sh
+#
+# Start/Stop/Restart the GNUMP3d Streaming Server by Boris Kurktchiev
+# <linux@bgdefenders.zzn.com>
+#
+# Now in order to use the script put it in /etc/rc.d/ (cp gnump3d-slack
+# /etc/rc.d/rc.mp3d), then do
+#
+# chmod 755 rc.mp3d, and either/or:
+#
+# 1. add this to rc.local: /etc/rc.d/rc.mp3d start
+# 2. add this to rc.M (before the call for rc.local or after it doesn't matter):
+# if [ -x /etc/rc.d/rc.mp3d ]; then
+#  . /etc/rc.d/rc.mp3d start
+# fi
+# NOTE: I recommend the first method because it is much simpler and cleaner :).
+# Enjoy!
+
+mp3d_start() {
+  echo "Starting GNUMP3d Streaming MP3 Server: $0 start"
+  /usr/bin/gnump3d --quiet &
+}
+mp3d_stop() {
+  echo "Stopping GNUMP3d Streaming MP3 Server: $0 stop"
+  killall gnump3d
+}
+
+mp3d_restart() {
+  echo "Restarting GNUMP3d Streaming MP3 Server: $0 restart"
+  mp3d_stop
+  sleep 1
+  mp3d_start
+}
+
+case "$1" in
+'start')
+  mp3d_start
+  ;;
+'stop')
+  mp3d_stop
+  ;;
+'restart')
+  mp3d_restart
+  ;;
+*)
+  echo "usage $0 start|stop|restart"
+esac

@@ -1,0 +1,24 @@
+
+themes/
+
+  This is the new location of the GNUMP3d themes.
+
+  The layout is as follows:
+
+        lang/
+            /theme-name/
+
+  e.g.:
+
+        en/
+        en/default/
+        en/tabular/
+        ..
+        ..
+        de/
+        de/default/
+        de/tabular/
+
+Steve
+--
+

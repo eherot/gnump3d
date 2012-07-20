@@ -1,0 +1,90 @@
+.\" gnump3d man page
+.\" 
+.\" I'm not too good at writing these files, I'd love a tool
+.\" to do it for me..
+.\" 
+.\" 
+.\" .de Id
+.\" .ds Dt \\$4
+.\" ..
+.\" .Id 1.0
+.\" .ds = \-\^\-
+.\" .de Sp
+.\" .if t .sp .3
+.\" .if n .sp
+.\" ..
+.\" .ta 3n
+.TH "GNUMP3d" "1" "\*(Dt" "GNU" ""
+.SH "NAME"
+GNUMP3d \- GNU MP3 / OGG Vorbis Streaming Server
+.SH "SYNOPSIS"
+.B gnump3d
+.RI [ options ]
+.Sp 
+.B gnump3d
+is a simple server allows you to stream MP3/OGG/Movie files
+across a network.
+
+It is designed to be simple, reliable, and extensible \- with the addition of plugins.  
+
+It's user interface may also be changed with the addition of themes.
+
+.SH "OPTIONS"
+The following options are supported:
+
+\fB\-\-background\fP
+.Sp 
+Run in the background after starting the server.
+
+\fB\-\-debug\fP
+.Sp 
+Run in the foreground, outputting any diagnostics to the console.
+
+\fB\-\-fast\fP
+.Sp
+Fast startup, don't index the music archive to build a song tag database.
+
+\fB\-\-quiet\fP
+.Sp 
+Don't display the startup banner when the program starts.
+
+\fB\-\-version\fP
+.Sp 
+Show the version number of the gnump3d software, then exit.
+
+\fB\-\-help\fP
+.Sp 
+Display brief usage instructions, then exit.
+
+\fB\-\-lang xx\fP
+.Sp
+Set the language the server should show it's output in.  ("en" by default).
+
+\fB\-\-plugin\-dir\fP directory
+.Sp 
+Specify which directory the plugins should be read from.
+
+\fB\-\-theme\-dir\fP directory
+.Sp 
+Specify which directory the theme files should be read from.
+
+\fB\-\-dump\-plugins\fP
+.Sp 
+Display all the plugins that the server has found, their versions authors, 
+and descriptions.
+
+\fB\-\-port\fP port
+.Sp 
+Set which port the program should listen upon.
+
+\fB\-\-root\fP directory
+.Sp 
+Specify the root of your music archive, which is presented to clients.
+
+
+
+.SH "AUTHOR Steve Kemp <steve@steve.org.uk>"
+
+.SH "SEE ALSO"
+.BR gnump3d.conf (1),
+.BR gnump3d\-top (1)

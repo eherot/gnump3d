@@ -1,0 +1,3543 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+  GNUMP3D  - A portable(ish) MP3 server.
+
+  gnump3d2 - A compatible Perl implementation of the original GNUMP3d.
+
+Homepage:
+   http://www.gnump3d.org/
+
+=cut
+
+
+
+=head1 VERSION
+
+  $Id: gnump3d2,v 1.156 2007/10/16 22:17:51 skx Exp $
+
+=cut
+
+
+
+=head1 LICENSE
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+
+=cut
+
+
+
+=head1 AUTHOR
+
+ Steve Kemp
+ --
+ http://www.steve.org.uk/
+
+=cut
+
+
+
+
+
+#
+#  Make sure that signals cause our END segment to run
+# so that we are able to log even incomplete transfers.
+#
+use sigtrap qw(die normal-signals error-signals);
+
+#
+#  Packages and modules we use.
+#
+use strict;                # Standard safety checks.
+use English;               # Avoid $<, etc.
+use Getopt::Long;          # For our argument parsing.
+use IO::Socket;            # Socketing code.
+use Env;                   # Only necessary to read $HOME.
+use POSIX ":sys_wait_h";   # For reaping children.
+BEGIN { POSIX::WNOHANG };
+
+use gnump3d::config;       # My configuration file reading module.
+use gnump3d::files; 	   # My routines for working with files and dirs.
+use gnump3d::filetypes;    # My routines for working with files types.
+use gnump3d::lang::lookup; # Multilingual text translations.
+use gnump3d::sorting;	   # Global sorting functions.
+use gnump3d::tagcache;     # Access to the tag cache.
+use gnump3d::IP;           # Local copy of NetAddr::IP.
+use gnump3d::MD5;          # To see if downsampling works.
+use gnump3d::Request;      # HTTP-Request parsing.
+use gnump3d::url;          # URL encoding and decoding
+
+#
+# Global variables
+#
+use vars qw ($main_socket %mime_cache $reload_cache @callbacks);
+
+#
+#
+#  Globally important settings.
+#
+#
+#  These are settings which are read from the configuration file, or
+# set by the command line.
+#
+#  If '--test' is specified upon the command line then environmental
+# variables may be used to override the contents of the configuration
+# file.
+#
+#
+our $ROOT;             # The root of the MP3 archive.
+our $PORT;             # The port the server listens upon.
+our $bind_address;     # The address to bind upon.
+our $host;             # The hostname of the local machine.
+our $theme_dir;        # The directory from which theme files are read.
+our $plugin_dir;       # The directory from which plugin files are read.
+our $access_log;       # The file to write access logs to.
+our $error_log;        # The file to write error logs to.
+our $always_stream;    # Should songs be streamed always.
+our $truncate_logs;    # Should logfiles be truncated.
+our $client_host;      # Use the client supplied 'host:' header?
+our $default_theme;    # The name of the default theme.
+our $TIMEOUT;          # Timeout for socket reads - in seconds.
+our $STATSPROG;        # Path to the statistics gather binary.
+our $STATSARGS;        # Additional arguments to pass to the stats program.
+our $INDEXPROG;        # Path to the gnump3d-index script
+our $play_rec;         # Text to use for the 'play recursively' link.
+our $mime_file;        # Location of the 'mime.types' file to read.
+our $file_types;       # Location of the 'file.types' file to read.
+our $enable_browse;    # Enable people to browse the archive.
+our $sort_order  ;     # Default sorting order.
+our $down_enabled;     # Is downsampling enabled.
+our $down_cachedir;    # Which dir do we use for caching downsampled data
+our $down_cache_limit; # How much diskspace do we allow for caching
+our $default_quality;  # Default quality for visitors.
+our $dir_format ;      # Display format string for directories.
+our $dir_format2;      # Alternate display format string for directories.
+our $file_format;      # Display format string for files.
+our $file_format2;     # Alternate display format string for files.
+our $new_format;       # Text to display next to `New` directories.
+our $new_days;         # Days old a file must be to count as new.
+our $song_format;      # Display format string for song titles.
+our $hide_song_tags;   # Should we just disable song tags?
+our $disable_tag_cache; # Should we just disable tag caching?
+our $NOW_PLAYING_PATH; # Cache file for the 'currently' playing tracks.
+our $in_progress = "";     # Marker.
+our $jukebox;          # Should we play songs locally?
+our $jukebox_binary;   # The binary to use for playing locally.
+our $tag_cache;        # The file to cache tag information to.
+our $advanced_playlist; # Should we include extra information in .m3u files?
+our $seperate_folders; # Should folders and files be seperated in the playlists
+our $host_rewrite;	# Allow rewrites of hostname in m3u
+our $meta_tags;          # Optional meta tags to include.
+
+
+
+#
+# Read-only variables.
+#
+my $REVISION      = '$Id: gnump3d2,v 1.156 2007/10/16 22:17:51 skx Exp $';
+our $VERSION      = "";
+$VERSION = join (' ', (split (' ', $REVISION))[1..3]);
+$VERSION =~ s/,v\b//;
+$VERSION =~ s/(\S+)$/($1)/;
+
+our $RELEASE = "3.0";
+
+
+#
+#  We want to avoid SIG_PIPE signals.
+#
+#
+$SIG{PIPE} = 'IGNORE';
+
+#
+#  Reap children - taken from the Perl Cookbook (Recipe 16.19)
+#
+$SIG{CHLD} = \&REAPER;
+sub REAPER {
+  my $stiff;
+  while( ($stiff = waitpid(-1,&WNOHANG)) > 0 ) {
+    # Do something with $stiff if you want
+  }
+  $SIG{CHLD} = \&REAPER;
+}
+
+
+
+#
+#  Per-child globals.
+#
+#  The HTTP code is set here when the header is sent out in response to
+# a client request.
+#
+#  The served size is incremented when data is sent out.
+#
+#  Both are used to write a log entry.
+#
+our $HTTP_CODE         = 0;   # The HTTP header code we sent to the client.
+our $SERVED_SIZE       = 0;   # Size of data we've sent back to this client.
+our $USE_SHOUTCAST     = 0;   # Should we serve Shoutcast information?
+our $connected_address = "";  # The remote address of the connected client.
+our $REQUEST           = "";  # The URI requested.
+our $USER_AGENT        = "";  # If sent by the browser.
+our $RANGE             = "";  # If a range header for seeking is sent.
+our $REFERRER          = "";  # The referrer which brought the client here.
+our $LANGUAGE          = "";  # The client brower's language.
+our %ARGUMENTS         = ();  # URL parameters/cookie values.
+our $data              ;      # The socket we communicate to our clients with.
+our $FILE_TYPES        ;
+
+
+#
+#  These variables are set by the argument processing,
+# and are used to control how we start up.
+#
+my $SHOW_HELP         = 0;    # Show help and exit.
+my $SHOW_VERSION      = 0;    # Show version and exit.
+my $CMD_ROOT          = "";   # Servers root directory.
+my $CMD_LANG          = "en"; # Language to use.
+my $CMD_PORT          = "";   # Servers port number.
+my $CMD_THEME_DIR     = "";   # Theme directory.
+my $CMD_PLUGIN_DIR    = "";   # Plugin loading directory.
+my $CMD_DEFAULT_THEME = "";   # The default theme.
+my $SHOW_PLUGINS      = 0;    # Show available plugins and exit.
+my $BACKGROUND        = 0;    # Run in background.  Implies '$QUIET'
+my $FAST_START        = 0;    # Dont re-index the archive on startup.
+my $QUIET             = 0;    # If set suppress the startup banner.
+my $DEBUG             = 0;    # If report errors to the console
+our $CONFIG_FILE      = "";   # Our configuration file.
+
+
+
+#
+#  Always load the text strings before anything else, the language
+# to load comes from the command line flag "--lang=xx", where en
+# is the default.
+#
+our $literals = gnump3d::lang::lookup->new();
+$literals->loadLanguage( $CMD_LANG );
+
+
+
+#
+# Parse any arguments which might be present upon the command line.
+#
+parseArguments();
+
+
+#
+#  Read the configuration options from our configuration file.
+#
+readConfigFile();
+
+#
+#  Load up our file type tester
+#
+$FILE_TYPES = gnump3d::filetypes->new( file => $file_types );
+
+
+
+#
+#  If any of the command line options were intend to override the
+# configuration files contents then perform those overrides here.
+#
+overideConfigFile();
+
+
+#
+#  Now check that all of our options are appropriate/sane.
+#
+#  This is done after reading the configuration file, and allowing
+# the command line flags to take effect.
+#
+#  The intention is that these checks will catch common errors which
+# will stop the server from running properly, or starting at all.
+#
+sanityCheck();
+
+
+#
+#  Make sure that our root directory does not contain a trailing
+# '/' or '\' character.
+#
+if ( $ROOT =~ /(.*)[\/\\]$/ )
+{
+  $ROOT = $1;
+}
+
+
+#
+# Parse the systems mime file - this is used to send appropriate
+# Content-type: headers to clients.
+#
+mkcache();
+
+
+#
+#  Empty the currently playing directory.
+#
+if ( defined( $NOW_PLAYING_PATH ) && ( -d $NOW_PLAYING_PATH ) )
+{
+    opendir( NOW_PLAYING, $NOW_PLAYING_PATH );
+    my @staleFiles=grep(/\.txt$/, readdir NOW_PLAYING);
+    closedir( NOW_PLAYING );
+
+    foreach my $file ( @staleFiles )
+    {
+      if (&isWindows( ))
+      {
+	unlink( "$NOW_PLAYING_PATH/$file" );
+      }
+      else
+      {
+	unlink( $file );
+      }
+    }
+}
+
+#
+#  Load all of our plugins
+#
+loadAllPlugins();
+
+#
+#  Create the socket for accepting connections upon.
+#
+$main_socket = new IO::Socket::INET (LocalAddr => $bind_address,
+				     LocalPort => $PORT,
+				     Listen    => 5,
+				     Proto     => 'tcp',
+				     ReuseAddr => 1,
+				     Reuse => 1
+				    );
+
+#
+# Shut down the listening socket upon interruptions.
+#
+$SIG{INT} = sub { close ($main_socket); print "Killed: SIG_INT\n"; exit; };
+
+
+#
+#  Check for success.
+#
+if ( ! defined( $main_socket ) )
+{
+    my $error = $literals->get( "ERROR_BIND" );
+    print $error;
+    exit;
+}
+
+#
+#  Setup the buffering/flushing.
+#
+$main_socket->autoflush(1);
+
+
+#
+# If host_rewrite is set, we will rewrite http://$host:$port/$playlist to
+# http://$host_rewrite/$playlist.  This is useful for server farms and
+# proxied connections.
+#
+$host_rewrite = &getConfig( "host_rewrite", "" );
+
+
+#
+# Make sure our host is defined.
+#
+if ( ! $host_rewrite ) { $host .= ":$PORT"; }
+else { $host = $host_rewrite; }
+
+
+
+#
+#  Print a little banner unless the user specified a quiet startup.
+#
+if ( ! $QUIET )
+{
+    my $text = $literals->get( "STARTUP_BANNER" );
+    print $text;
+}
+
+
+
+#
+#  Warn about the use of the experimental, unsupported, jukebox mode.
+#
+if ( $jukebox )
+{
+    if ( &isWindows() )
+    {
+	print "Jukebox mode will never be supported for Windows.\n";
+	$jukebox = 0;
+    }
+    else
+    {
+	print "Warning: This server is running with the untested, unfinished,\n";
+	print "         jukebox mode enabled.\n";
+    }
+}
+
+
+
+#
+#  Now re-index the musical collection if necessary.  Don't do it
+# if told explicitly not to via the --fast command line flag, or
+# if the
+#
+if ( ( ! $FAST_START ) && ( ! $disable_tag_cache ) )
+{
+    #
+    # Print message.
+    #
+    if ( ! $QUIET )
+    {
+        my $info  =  $literals->get( "RUNNING_INDEX" );
+		print $info;
+    }
+
+    #
+    #  fork() + exec() - run `gnump3d-index` in the background.
+    #
+    #  This means that the song database is always up to date when the server starts.
+    my $pid = 0;
+    if ($pid = fork)
+    {
+	# parent catches INT and berates user
+	local $SIG{INT} = sub { print "Tsk tsk, no process interruptus\n" };
+	waitpid($pid, 0);
+    }
+    else
+    {
+	my $efork = $literals->get( "ERROR_FORK" );
+
+	if (! defined( $pid ) )
+	{
+	    print $efork;
+	    die $efork;
+	}
+
+	# child ignores INT and does its thing
+	$SIG{INT} = "IGNORE";
+	exec( $INDEXPROG ) or die "Can't exec '$INDEXPROG' : $!\n";
+
+	if ( -e $tag_cache )
+	{
+	  print "Failed to run indexing program correctly.\n";
+	  print "Please investigate and fix.\n";
+	  exit;
+	}
+    }
+
+    #
+    # Tell the user that the indexing is complete, unless running
+    # with --quiet.
+    #
+    if ( ! $QUIET )
+    {
+        my $info = $literals->get( "INDEXING_COMPLETE" );
+        print $info;
+    }
+}
+
+#
+#  Fork into the background if we're supposed to.
+#
+#  NOTE: This won't happen if we're running under '--debug'.
+#
+if ( ( not $DEBUG ) and ( $BACKGROUND ) )
+{
+    fork() && exit;
+    close(STDOUT);
+    close(STDERR);
+}
+
+#
+# Initialize the song cache - this should be done after the
+# fork() + exec of the gnump3d-index script.
+#
+our $tagCache = gnump3d::tagcache->new( );
+$tagCache->setDisableCache( $disable_tag_cache );
+$tagCache->setCacheFile( $tag_cache );
+$tagCache->setFormatString( $song_format );
+$tagCache->setNewFormatString( $new_format );
+$tagCache->setNewDays( $new_days );
+$tagCache->setHideTags( $hide_song_tags );
+
+#
+# Reload cache if given SIGHUP.
+#
+$reload_cache = 0;
+$SIG{HUP} = sub { $reload_cache = 1; };
+
+#
+#  Make sure that all our errors and output go to the error
+# log if it's defined.
+#
+if ( ( defined( $error_log ) and length( $error_log ) ) )
+{
+    select STDOUT;
+    $| = 1;
+
+    if ( not $DEBUG )
+    {
+	if ( $truncate_logs )
+	{
+	    open (STDOUT,">$error_log");
+	    open (STDERR,">$error_log");
+	}
+	else
+	{
+	    open (STDOUT,">>$error_log");
+	    open (STDERR,">>$error_log");
+	}
+    }
+}
+
+print STDERR "gnump3d starting at " . POSIX::ctime(time());
+
+#
+#  Truncate the logfile if we've been told to.
+#
+if ( $truncate_logs )
+{
+    my $fail = $literals->get( "FAIL_TRUNCATE" );
+
+    open ( LOGFILE,">$access_log") or warn $fail;
+    close( LOGFILE );
+}
+
+#
+# Open the output logfile before we drop priviledges, or change user.
+#
+# NOTE: This is left open, but only flock()d where it is used.
+#
+my $logError = $literals->get( "FAIL_OPEN_LOGFILE" );
+
+open( LOGGER, ">>$access_log" ) or die $logError;
+
+
+
+#
+#  If there's a user we should run as we'll change to that now that
+# we have bound our sockets, and opened our logfile(s).
+#
+our $username = getConfig( "user", "" );
+if ( ( defined( $username ) ) and
+     ( ! isWindows() ) )
+{
+    my ($n,$p, $u,$g, $q,$c,$gc,$dir,$sh);
+    ($n,$p, $u,$g, $q,$c,$gc,$dir,$sh)=getpwnam( $username );
+
+    if ( defined( $u ) and defined( $g ) )
+    {
+        #
+	# NOTE: Switch GID first - because once switching UID.
+	#       switching GID fails.
+        #
+	$GID = $g;
+	$EGID= $g;
+	$UID = $u;
+	$EUID= $u;
+    }
+    else
+    {
+        my $userError = $literals->get( "FAILED_USER_SWITCH" );
+	print $userError;
+	exit;
+    }
+}
+
+
+
+
+#
+#  Main accept loop.
+#
+#  Listen for each incoming request, fork() a child to handle it.
+#
+#
+while (1)
+{
+    next unless $data = $main_socket->accept(); #wait for connections
+
+    my $pid = fork();		    #we are forking...
+
+    if ( $pid == 0 )
+    {
+	##
+	# CHILD.
+	##
+
+        #
+        # Abort with error message if we cannot fork().
+        #
+        my $forkFail = $literals->get( "ERROR_FORK" );
+	if ( !defined( $pid ) )
+	{
+	    print $forkFail;
+	    exit;
+	}
+
+	#
+	# Timeout.
+	#
+	$SIG{ALRM} = sub { die "timeout" };
+
+	#
+	# Don't leave the server socket open in child.
+	#
+	close($main_socket);
+
+	if ($data)
+	{
+	    my $endofline = $/;
+	    $/ = "\cM\cJ";
+
+	    #
+	    # Get the name of the connecting client.
+	    #
+	    my $other_end         = getpeername($data)
+	      or warn "Couldn't identify other end: $!\n";
+	    my ($port, $iaddr)    = unpack_sockaddr_in($other_end);
+	    $connected_address    = inet_ntoa($iaddr);
+
+	    my $i       = "";
+	    my $request = "";
+
+	    #
+	    #  This eval block is here so that were can prevent DOS
+	    # attacks by closing sockets if there's nothing received.
+	    # after a while.
+	    #
+	    eval
+	    {
+		# Time is specified in config file.
+		if ( ! &isWindows() )
+		{
+	         	alarm( $TIMEOUT );
+		}
+
+		#
+		# Read in each line of the request - and save it for
+		# later processing.
+		#
+		while( defined( $i = readline($data) ) && ( length( $i ) > 2 ) )
+		{
+		    $request .= $i;
+		}
+
+		#
+		# We've finished reading the header now - so cancel the
+		# alarm timer.
+		#
+		if ( ! &isWindows() )
+		{
+			alarm(0);
+		}
+	    };
+
+	    $/ = $endofline;
+
+	    #
+	    #  Test for timout errors.
+	    #
+	    if ($@)
+	    {
+		if ($@ =~ /timeout/)
+		{
+		    # Timed out.  Close socket.  Exit.
+		    close($data);
+		    exit;
+		}
+		else
+		{
+		    alarm(0);   # clear the still-pending alarm
+		    die;        # propagate unexpected exception
+		}
+	    }
+
+	    #
+	    #  Now we have an incoming request we should parse it.
+	    #
+	    my $httpRequest = gnump3d::Request->new( request => $request );
+
+	    #
+	    #  Requested path.
+	    #
+	    our $uri = $httpRequest->getRequest();
+
+	    #
+	    #  Constants.
+	    #
+	    $USER_AGENT = $httpRequest->getUserAgent();
+	    $REFERRER   = $httpRequest->getReferer();
+
+	    #
+	    #  Languages
+	    #
+	    my @langs = $httpRequest->getLanguage();
+	    $LANGUAGE = "";
+
+	    foreach my $lang ( @langs )
+	    {
+		if ( -d $theme_dir . "/" . $lang )
+		{
+		    $DEBUG && print "Language directory exists for : $lang\n";
+
+		    # OK theme language exists.
+		    if ( !length( $LANGUAGE ) )
+		    {
+			$LANGUAGE = $lang;
+		    }
+		}
+	    }
+	    if ( !length( $LANGUAGE ) )
+	    {
+		$LANGUAGE = $CMD_LANG;
+	    }
+
+
+
+	    #
+	    # No URI -> HTTP Error
+	    #
+	    if ( !defined( $uri ) )
+	    {
+		my $header = getHTTPHeader( 501, "text/html" );
+		&sendData( $data, $header );
+		close( $data );
+		exit;
+	    }
+
+	    #
+	    #  See if the client sent us a server name; if it did we use that
+	    # in preference to what we were using - to handle ssh port
+	    # forwarding etc.
+	    #
+	    #  This is a configurable option, controlled via the .conf file:
+	    # 'use_client_host=0' to disable it.
+	    #
+	    if ( $client_host )
+	    {
+		if ( $request =~ /Host: ([^\r\n]+)/ )
+		{
+		    my $chost = $1;
+		    if ( $chost =~ /(.*):([0-9]+)/ )
+		    {
+			# Host already contains a port.
+			$host = $chost;
+		    }
+		    else
+		    {
+			# Host was missing a port number.
+			$host = $chost . ":" . $PORT;
+		    }
+		}
+	    }
+
+
+	    #
+	    # See if the client wanted to receive shoutcast meta-data.
+	    #
+	    if ( $request =~ /Icy-MetaData:/i )
+	    {
+		$USE_SHOUTCAST = 1;
+	    }
+
+	    #
+	    # See if the client is sending a range header to indicate that
+	    # we should skip some song info.
+	    if ( $request =~ /Range: ([^\r\n]+)/ )
+	    {
+	        $RANGE = $1;
+		if ( $RANGE =~ /bytes=(.*)-/ )
+		{
+		    $RANGE = $1;
+		}
+	    }
+
+	    #
+	    #  Store any cookies into our request arguments hash.
+            #
+	    #  This is done so that we don't have to worry about
+	    # any individual cookies.
+	    #
+	    if ( $request =~ /Cookie: ([^\r\n]+)/ )
+	    {
+		my $list = $1;
+
+		my @cooks = split( /;/, $list );
+		foreach my $cookie ( @cooks )
+		{
+		    if ( $cookie =~ /([^=]+)=(.*)/ )
+		    {
+			my $key = $1;
+			my $val = $2;
+
+			# Strip leading and trailing whitespace.
+			$key =~ s/^\s+//;
+			$key =~ s/\s+$//;
+			$val =~ s/^\s+//;
+			$val =~ s/\s+$//;
+
+			# Decode.
+			$val =  &urlDecode( $val );
+
+			if ( $key =~ /^theme$/i )
+			{
+                            # Themes may only be named using numbers + letters
+                            $val =~ tr[A-Za-z0-9_]||cd;
+                        }
+
+			$ARGUMENTS{ $key } =$val
+		    }
+		}
+	    }
+
+
+	    #
+	    #  Make sure the user is actually allowed to talk to us
+	    # this works by comparing the client address to those addresses
+	    # given in 'allowed_clients', and 'denied_clients'.
+	    #
+	    if ( &bannedAddress( $connected_address ) )
+	    {
+		my $header   = getHTTPHeader( 200, "text/html" );
+		&sendData( $data, $header );
+
+		my $text = &getErrorPage( $ARGUMENTS{'theme'},
+					  $literals->get( "ACCESS_DENIED" ) );
+		&sendData( $data, $text );
+		close( $data );
+		exit;
+	    }
+
+	    #
+	    #  See if the server admin has defined a particular
+	    # referring URL which is allowed to connect.
+	    #
+            my $ref = &getConfig( "valid_referrer", undef );
+	    if ( defined( $ref ) && length( $ref ) )
+	    {
+	    	# We can only test the referrer if one was supplied.
+	    	if ( length( $REFERRER ) )
+		{
+		    if ( $REFERRER =~ /^$ref/ )
+		    {
+		        $DEBUG && print "Referrer '$REFERRER' matches '$ref'\n";
+		    }
+		    else
+		    {
+		    	my $header   = getHTTPHeader( 200, "text/html" );
+		        &sendData( $data, $header );
+
+		        my $text = &getErrorPage( $ARGUMENTS{'theme'},
+						  $literals->get( "ACCESS_DENIED" ) );
+		        &sendData( $data, $text );
+		        close( $data );
+		        exit;
+		    }
+		}
+	    }
+
+	    #
+	    # Handle an URL parameters which might be present.
+	    #
+	    if ( $uri =~ /(.*)\?(.*)/ )
+	    {
+		$DEBUG && print "CGI-type request\n";
+		# Strip off the params from the URI
+		$uri = $1;
+
+		# Handle each parameter.
+		my $args = $2;
+		foreach my $term (split(/&/, $args ) )
+		{
+		    if ( $term =~ /([^=]+)=(.*)/ )
+		    {
+			my $key = $1;
+			my $val = $2;
+			$key = &urlDecode( $key );
+			$val = &urlDecode( $val );
+
+			# Decode.
+			$val =  &urlDecode( $val );
+
+			if ( $key =~ /^theme$/i )
+			{
+                            # Themes may only be named using numbers + letters
+                            $val =~ tr[A-Za-z0-9_]||cd;
+                        }
+
+			print "Arg '$key' -> $val\n";
+			$ARGUMENTS{ $key } = $val;
+		    }
+		}
+	    }
+	    else
+	    {
+		$DEBUG && print "No CGI parameters for URI $uri\n" ;
+	    }
+
+	    #
+	    # Decode the URL encoding.
+	    #
+	    $uri = &urlDecode( $uri );
+
+
+	    #
+	    # Don't allow traversal outside the root directory.
+	    #
+	    $uri = &sanitizePath( $uri );
+
+	    #
+	    # Setup the default theme if one wasn't present in the request.
+	    #
+	    if ( !defined ( $ARGUMENTS{ "theme" } ) or
+		 !length( $ARGUMENTS{ "theme" } ) )
+	    {
+		$ARGUMENTS{ "theme" } = $default_theme;
+	    }
+
+
+	    #
+	    # Save the requested URL in a global, so we can log it
+	    # when the transaction is over.
+	    #
+	    $REQUEST = $uri;
+
+
+	    #
+	    # Test for a 'standard' playlist file.
+	    #
+	    if ( ( $uri =~ /random.m3u$/ ) or
+		 ( $uri =~ /recurse.m3u$/ ) )
+	    {
+		#
+		# If this is in the jukebox mode patch up.
+		#
+		if ( $jukebox )
+		{
+		    my $header   = getHTTPHeader( 401, "text/html" );
+		    &sendData( $data, $header );
+
+		    my $text = &getErrorPage( $ARGUMENTS{'theme'},
+					      "Jukebox mode only works for single files.  Sorry." );
+		    &sendData( $data, $text );
+		    close( $data );
+		    exit;
+		}
+
+		my $playlist = &getPlaylist( $uri );
+		my $header   = getHTTPHeader( 200, "audio/x-mpegurl" );
+		&sendData( $data, $header );
+		&sendData( $data, $playlist );
+		close( $data );
+		exit;
+	    }
+
+	    #
+	    # Test for a single file playlist file.
+	    #
+	    if ( ( $uri =~ /(.*)\.m3u$/ ) &&
+		 ( $always_stream ) )
+	    {
+		my $plainFile = $1;
+		my $testPath = $ROOT . "/" . $plainFile;
+		$testPath = sanitizePath($testPath);
+		if ( ( -e $testPath ) && ( ! -d $testPath ) )
+		{
+		    #
+		    #  This was just a single file playlist.
+		    #
+		    my $header   = getHTTPHeader( 200, "audio/x-mpegurl" );
+		    &sendData( $data, $header );
+
+		    my $link = "http://" . $host . &urlEncode( $plainFile );
+
+		    #
+		    # Get ready to add on any bitrate settings to the file
+		    # within the playlist.
+		    #
+		    if ( defined( $ARGUMENTS{"quality"} ) and
+			 length(  $ARGUMENTS{"quality"} ) )
+		    {
+			$link .= "?quality=" . $ARGUMENTS{"quality"};
+		    }
+
+		    &sendData( $data, $link );
+		    close( $data );
+		    exit;
+		}
+	    }
+
+	    #
+	    # Mogrify the filename to a local file/directory.
+	    #
+	    #  TODO: Support virtual hosts here, amongst other places.
+	    #        (This would be the key location though).
+	    #
+	    my $testPath = $ROOT . "/" . $uri;
+	    $testPath = sanitizePath($testPath);
+
+	    #
+	    # Store the request in the "currently playing" directory.
+	    #
+	    if ( $FILE_TYPES->isAudio( $testPath ) )
+	    {
+		# Matt: improve in_progress so that it actually works
+		$in_progress = "$NOW_PLAYING_PATH/${connected_address}.$$.txt" ;
+		open( TMP, ">" . $in_progress );
+		print TMP $testPath;
+		close( TMP );
+	    }
+
+
+	    #
+	    #  See if any of the loaded plugins can handle the requested
+	    # path.
+	    #
+	    #  If they do we assume they will generate the complete output.
+	    # (So we exit the child immediately afterwards.)
+	    #
+	    foreach my $plugin (@callbacks)
+	    {
+		$DEBUG && print "Testing plugin : $plugin - for $uri";
+
+		#
+		# Create new plugin instance.
+		#
+		my $module;
+		if ( UNIVERSAL::can( $plugin, 'new' ) )
+		{
+		    $module = $plugin->new( %ARGUMENTS );
+		}
+		else
+		{
+		    $DEBUG && print "Plugin $plugin has no 'new' method!\n";
+		}
+
+		#
+		# If that plugin defines the function 'wantsPath'
+		#
+		if ( UNIVERSAL::can($module, 'wantsPath' ) )
+		{
+		    #
+		    # Test to see if the plugin cares about the given
+		    # requested path.
+		    #
+		    if ( $module->wantsPath( $uri ) )
+		    {
+			$DEBUG && print " plugin will handle path\n";
+
+			#
+			# If so call it, and exit.
+			#
+			$module->handlePath( $uri );
+			exit;
+		    }
+		    else
+		    {
+			$DEBUG && print " plugin won't handle path\n";
+		    }
+		}
+		else
+		{
+		    $DEBUG && print "Module $module - does not implement 'wantsPath'\n";
+		}
+	    }
+
+
+	    #
+	    #  Test to see if the request was a directory.
+	    #
+	    if ( ( -d $testPath ) and $enable_browse )
+	    {
+		my $header   = getHTTPHeader( 200, "text/html" );
+		&sendData( $data, $header );
+
+		if ( $testPath =~ /(.*)\/$/ )
+		{
+		  # Nop
+		}
+		else
+		{
+		  $testPath .= "/";
+		}
+
+		my $directoryData = &serveDirectory( $testPath,
+						     $ARGUMENTS{"theme"} );
+		&sendData( $data, $directoryData );
+		close( $data );
+		exit;
+	    }
+
+	    #
+	    #  Is this a plain file within the archive?
+	    #
+	    #  This could be; An album cover, a song itself, a movie,
+	    # or a playlist.
+	    #
+	    if ( -f $testPath )
+	    {
+		if ( $testPath =~ /m3u$/i )
+		{
+		    #
+		    # If this is in the jukebox mode patch up.
+		    #
+		    if ( $jukebox )
+		    {
+			my $header   = getHTTPHeader( 401, "text/html" );
+			&sendData( $data, $header );
+
+			my $text = &getErrorPage( $ARGUMENTS{'theme'},
+						  "Jukebox mode only works for single files.  Sorry." );
+			&sendData( $data, $text );
+			close( $data );
+			exit;
+		    }
+
+
+		    #
+		    # Get the possibly fixed up, playlist file
+		    #
+ 		    my $text = &adjustPreMadePlaylist(  $testPath );
+
+		    if ( length( $text ) )
+		    {
+
+		        my $header   = getHTTPHeader( 200,
+						       "audio/x-mpegurl" );
+			&sendData( $data, $header );
+			&sendData( $data, $text );
+			exit;
+		    }
+		    else
+		    {
+		        #
+		        # There was a problem reading the playlist.
+		        #
+		        my $header   = getHTTPHeader( 404, "text/html" );
+			&sendData( $data, $header );
+
+
+			my $text = &getErrorPage( $ARGUMENTS{'theme'},
+						  $literals->get( "EMPTY_PLAYLIST" ) );
+			&sendData( $data, $text );
+			exit;
+		    }
+		}
+		else
+		{
+		    if ( $FILE_TYPES->isAudio( $testPath ) )
+		    {
+			if ( $jukebox )
+		        {
+			    #
+			    # Play song upon server...
+			    #
+			    &jukeBoxPlayFile( $testPath );
+
+			    #
+			    # Note: Above function never returns..
+			    #
+			}
+			else
+			{
+			    #
+			    # Serve an audio file, pos. with downsampling.
+			    #
+			    &streamAudioFile( $data, $testPath );
+			}
+		    }
+		    else
+		    {
+			#
+			# Serve a normal non-audio file.
+			#
+			&serveFile( $data, $testPath );
+		    }
+		}
+		exit;
+	    }
+
+	    #
+	    # Fall back to serving from the theme directory.
+	    #
+	    if ( defined( $ARGUMENTS{"theme"} ) &&
+		 length $ARGUMENTS{"theme"} )
+	    {
+		$testPath =  $theme_dir . "/" . $ARGUMENTS{"theme"} . $uri;
+		if ( -e $testPath )
+		{
+		    if ( $testPath =~ /\.html$/i )
+		    {
+			my $mime = $mime_cache{ lc( &getSuffix( $testPath ) ) };
+			my $header = getHTTPHeader( 200, $mime );
+
+			my @lines = &readFileWithExpansion( $testPath );
+			foreach my $line ( @lines )
+			{
+			    $line =~ s/\$HOSTNAME/$host/g;
+			    $line =~ s/\$VERSION/$VERSION/g;
+			    $line =~ s/\$RELEASE/$RELEASE/g;
+
+			    &sendData( $data, $line );
+			}
+
+		    }
+		    else
+		    {
+			&serveFile( $data, $testPath );
+		    }
+		    exit;
+		}
+	    }
+
+	    {
+		#
+		#  If we've not served the file by now we've hit an
+		# error.
+		#
+		my $header   = getHTTPHeader( 404, "text/html" );
+		&sendData( $data, $header );
+
+
+		#
+		# Prevent XSS attacks
+		#
+		$uri = urlEncode( $uri );
+
+		my $text = &getErrorPage( $ARGUMENTS{'theme'},
+					  $literals->get( "ERROR404" ) );
+		&sendData( $data, $text );
+		close( $data );
+		exit;
+	    }
+
+	    #
+	    # We're finished with the socket now.
+	    #
+	    close($data);
+	}
+	exit;  # terminate the child.
+
+    } else {
+	#
+	# Parent from the fork();
+	#
+	# Reload the tag cache if we were instructed to.
+	if ($reload_cache) {
+	  $tagCache->setCacheFile( $tag_cache );
+	  $reload_cache = 0;
+	}
+
+	# then check for updates;
+	$tagCache->checkForUpdates();
+    }
+
+    #nothing to do.. wait for next request
+    close $data if $data;
+}
+
+
+
+#
+#  Return the textual representation for the given HTTP response code,
+# and MIME type.
+#
+sub getHTTPHeader
+{
+    my ( $code, $mime, $filename, $extra ) = (@_);
+    $extra = {} if !defined $extra;
+    # handle serving of a cached downsampling
+    my $mimepath = $extra->{mimepath} || $filename;
+    # matt: handle partial content
+    my $range = $extra->{range} || 0;
+    if (length($range) and $range > 0 and $code == 200) {
+    	$code = 206; # partial content
+    }
+
+    my $header = "";
+
+    #
+    # Send appropriate Data to any shoutcast compatible clients.
+    #
+    if ( $USE_SHOUTCAST )
+    {
+	#
+	# The title of the stream is the file information,
+	# if a filename was given to us to use.
+	#
+	my $display = "GNUMP3d Stream";
+	if ( defined( $filename ) and ( -e $filename ) )
+	{
+	    $display = &getSongDisplay( $filename, $song_format );
+	    $display =~ s/^$ROOT(.*\/)*//g;
+	}
+
+
+	$header  = "ICY $code OK\r\n";
+	$header .= "icy-notice1:This stream is served using GNUMP3d\r\n";
+	$header .= "icy-genre:Mixed\r\n";
+	$header .= "icy-name:$display\r\n";
+	$header .= "icy-url:$host\r\n";
+	$header .= "icy-pub:1\r\n";
+    }
+    else
+    {
+	$header = "HTTP/1.0 $code OK\r\n";
+    }
+
+
+    $header   .= "Connection: close\r\n";
+    $header   .= "Server: GNUMP3d $RELEASE\r\n"; # Identify ourself.
+    $header   .= "Content-type: $mime\r\n";
+
+
+    #
+    # If we're going to serve a file send the last modified
+    # date + size.
+    #
+    if ( defined( $filename ) and
+	 ( -e $filename ) )
+    {
+	my ($a,$b,$c,$d,$e,$f,$g,$length,$h,$mtime) = stat($filename);
+	$mtime = gmtime $mtime;
+	my ($day, $mon, $dm, $tm, $yr) =
+	    ($mtime =~ m/(...) (...) (..) (..:..:..) (....)/);
+
+	# matt: handle partial content
+	if (!$extra->{NoContentLength}) {
+	    $header .= "Content-Range: bytes $range-$length/$length\n";
+	    $length -= $range;
+	    $header .= "Content-length: $length\n";
+	}
+	$header .= "Last-Modified: $day, $dm $mon $yr $tm GMT\n";
+    }
+
+    # Matt: support NoCache
+    if ($extra->{NoCache}) {
+    	$header .= "Pragma: no-cache\nCache-control: no-cache\n";
+    }
+
+    #
+    # Set a cookie for each value we have received - even if they're
+    # not used.
+    #
+
+    foreach my $key (sort (keys( %ARGUMENTS ) ) )
+    {
+        # These keys should never be sent as cookies.
+        next if $key eq 'q' or $key eq 'play';
+
+	my $val = $ARGUMENTS{ $key };
+
+	$header .= "Set-Cookie: " . $key . "=" . $val . ";path=/; expires=Mon, 10-Mar-08 14:36:42 GMT;\r\n";
+    }
+    print "Header: $header\n";
+
+    #
+    # Terminate the HTTP header.
+    #
+    $header   .= "Connection: close\r\n";
+    $header   .= "\r\n";
+
+    #
+    #  Save the HTTP Header away - this will be written to the logfile
+    # when the transaction is over.
+    #
+    $HTTP_CODE = $code;
+
+    return( $header );
+}
+
+
+#
+#  Return an error page of HTML to describe the given error.
+#
+sub getErrorPage
+{
+    my ( $theme, $text ) = (@_);
+
+    my @lines = &getThemeFile( $theme, "error.html" );
+    my $total = "";
+
+    #
+    # Process the template file.
+    #
+    foreach my $line ( @lines )
+    {
+	#
+	# Make global substitutions.
+	#
+	$line =~ s/\$HOSTNAME/$host/g;
+	$line =~ s/\$VERSION/$VERSION/g;
+	$line =~ s/\$RELEASE/$RELEASE/g;
+	$line =~ s/\$DIRECTORY/\//g;
+	$line =~ s/\$TITLE/Error/g;
+	$line =~ s/\$ERROR_MESSAGE/$text/g;
+	$line =~ s/\$META/$meta_tags/g;
+
+
+	if ( $line =~ /(.*)\$BANNER(.*)/ )
+	{
+	    # Insert banner;
+	    my $pre  = $1;
+	    my $post = $2;
+	    $total .= $pre;
+	    $total .= &getBanner( "/" );
+	    $total .= $post;
+	}
+	else
+	{
+	    $total .= $line;
+	}
+    }
+    return( $total );
+}
+
+
+
+#
+#  Get a playlist for the given directory - the complexity of this
+# code is something I wish I could simplify.
+#
+#  Updated code welcome.
+#
+# TODO: Cleanup.
+#
+sub playlistForDirectory
+{
+  my ( $dir, $recursive, $random ) = ( @_ );
+
+  my @files = ();
+  my @filesonly = ();
+
+  #
+  # Read in the files for the playlist.
+  #
+  if ( ( $recursive ) and ( $seperate_folders ) )
+  {
+    @files = &filesInDirsOnlyRecursively( $dir );
+    @filesonly = &filesInDir( $dir );
+  }
+  elsif ( $recursive )
+  {
+    @files = &filesInDirRecursively( $dir );
+  }
+  else
+  {
+    @files = &filesInDir( $dir );
+  }
+
+  #
+  # Downsampling and sort order.
+  #
+  my $quality    = "";
+  if ( defined( $ARGUMENTS{"quality"} ) and
+       length(  $ARGUMENTS{"quality"} ) )
+  {
+    $quality = "?quality=" . $ARGUMENTS{"quality"};
+  }
+
+  if ( defined( $ARGUMENTS{"sort_order" } ) and
+       length( $ARGUMENTS{"sort_order" } ) )
+  {
+    $sort_order = $ARGUMENTS{ "sort_order" };
+  }
+  if ( !length( $sort_order) )
+  {
+    $sort_order = '$FILENAME';
+  }
+
+  my $final = "";
+  if ( $advanced_playlist )
+  {
+    $final = "#EXTM3U\n";
+  }
+
+  # Song tags if any.
+  my $tags = "";
+
+  #
+  # Sort the files according to the display preference.
+  #
+  my $sorter = gnump3d::sorting->new( );
+  $sorter->setTagCache( $tagCache );
+  @files = &sortFiles( $sort_order, @files );
+
+  # Put individual files at the bottom of the playlist
+  if ( ( $seperate_folders ) and ( $recursive ) )
+  {
+    @filesonly = &sortFiles( $sort_order, @filesonly );
+    push( @files, @filesonly );
+  }
+
+  #
+  #  Process each file that we will include in the playlist.
+  #
+  foreach my $file ( @files )
+  {
+    # Skip invalid files.
+    next if ( ! $FILE_TYPES->isAudio( $file ) );
+
+    # Make sure we can read the file.
+    next if ( ! -r $file );
+
+    #
+    # Get the extra details from the files there.
+    #
+    # Only read the tags if we want them.
+    #
+    if ( $advanced_playlist )
+    {
+        # Set the song format.
+        $tagCache->setFormatString( "#EXTINF:\$SECONDS,$song_format" );
+
+        $tags = "";
+        $tags = getSongDisplay( $file ) . "\n";
+        if ( not ( $tags =~ /^#EXTINF/ ) )
+        {
+            # fall back to just getting the length and filename
+            $tagCache->setFormatString( "#EXTINF:\$SECONDS,\$FILENAME" );
+
+             $tags = getSongDisplay( $file ) . "\n";
+
+	     #
+	     # Remove any leading path
+	     #
+	     $tags =~ s/^$ROOT(.*\/)*//g;
+
+             # last resort, just the filename
+             $tags = "#EXTINF:,$tags" if $tags !~ /^#EXTINF/;
+	}
+    }
+
+    # final stage fixup
+    $tags =~ s/^#EXTINF:,/#EXTINF:0,/;
+
+    if ($file =~ /$ROOT(.*)/)
+    {
+        $file = $1;
+    }
+
+    if ( ! $recursive  )
+    {
+        $file = $dir . "/" . $file;
+    }
+
+    $file = sanitizePath($file);
+
+    #
+    # Escape the filename.
+    #
+    $file = "http://" . $host . urlEncode( $file ) . $quality;
+
+    #
+    # Add to the playlist
+    $final .= $tags;
+    $final .= $file . "\n";
+  }
+
+  return( $final );
+}
+
+
+
+#
+#  Return a fully formed playlist for the given directory.
+#
+sub getPlaylist
+{
+    my ($uri) = (@_);
+
+    my $recurse = 0;
+    my $random  = 0;
+    my $dir     = 0;
+    my $bitrate = "";
+
+    if ( $uri =~ /(.*\/)all\.m3u$/ )
+    {
+	$dir     = $1;
+	$random  = 0;
+	$recurse = 0;
+    }
+    if ( $uri =~ /(.*\/)random\.m3u$/ )
+    {
+	$dir     = $1;
+	$random  = 1;
+	$recurse = 1;
+    }
+    if ( $uri =~ /(.*\/)recurse\.m3u$/ )
+    {
+	$dir     = $1;
+	$recurse = 1;
+
+	#
+	# Default to not randomizing the recursive playlist, unless
+	# the server config tells us to..
+	#
+	$random  = &getConfig( "recursive_randomize", 0 );
+    }
+
+    my $playlist = "";
+
+    if ( length( $dir ) )
+    {
+	$playlist = playlistForDirectory( $ROOT . $dir, $recurse, $random );
+    }
+    else
+    {
+	$playlist = playlistForDirectory( $ROOT, $recurse, $random );
+    }
+
+    return( $playlist );
+}
+
+
+
+
+#
+#  Read and return a pre-existing playlist file from the repository.
+#
+#  This may have to patch up the contents intelligently.
+#
+sub adjustPreMadePlaylist
+{
+    my ( $playlist ) = ( @_ );
+
+    my $dir      = $playlist;
+    my $text     = "";
+
+
+    if ( $dir =~ /$ROOT(.*)/ )
+    {
+	$dir = $1;
+    }
+    if ( $dir =~ /(.*)\/(.*)/ )
+    {
+	$dir = $1;
+    }
+
+    my @lines = &readFile( $playlist );
+    foreach my $line ( @lines )
+    {
+        chomp( $line );
+
+	if ( $line =~ /^\#/ )
+	{
+	    # Line is a comment.
+	    # Leave it as is.
+	}
+	elsif ( $line =~ /^http:/i )
+	{
+	    # External link, or manually constructed one
+	    # Leave well alone.
+	}
+	elsif ( $line =~ /$host/ )
+	{
+	    # Line already contains a server:port section.
+	    # Leave it as is.
+	}
+	elsif ( $line =~ /$ROOT\/(.*)/ )
+	{
+	    #
+	    # Line is fully qualified path.
+	    #
+	    $line = "http://" . $host . "/" . &urlEncode($1);
+	}
+	elsif ( $line =~ /^\// )
+	{
+	    #
+	    # Line is fully qualified.  Just prepend the
+	    # server name to it.
+	    #
+	    $line = "http://" . $host . &urlEncode($line);
+	}
+	else
+	{
+	    #
+	    # Line is just a straight filename, it needs
+	    # server:port + directory prepended to it.
+	    $line = "http://" . $host . &urlEncode( $dir . "/" . $line );
+	}
+
+	#
+	# Add in the quality argument if we have one.
+	#
+	if ( defined( $ARGUMENTS{"quality"} ) and
+	     length(  $ARGUMENTS{"quality"} ) )
+	{
+	    $line .= "?quality=" . $ARGUMENTS{"quality"};
+	}
+
+	#
+	# Add the potentially modified line
+	#
+	$text .= $line . "\n";
+    }
+
+    return( $text );
+}
+
+
+#
+#  Play the given file upon the local machine.
+#
+sub jukeBoxPlayFile
+{
+    my ( $file ) = ( @_ );
+
+    my $safeFile = $file;
+    $safeFile    =~ s/([\"\$\\])/\\$1/g;
+    $safeFile    =~ s/\'/\'"'"\'/g;
+    $safeFile    = "'" . $safeFile . "'";
+
+    # Send OK header.
+    my $header   = getHTTPHeader( 200, "text/html" );
+    &sendData( $data, $header );
+
+    my $text = &getErrorPage( $ARGUMENTS{'theme'},
+			      "Playing file '$file' locally!" );
+    &sendData( $data, $text );
+    close( $data );
+
+    #
+    # Evil. Hack.
+    # TODO: Fixme.
+    #
+    system( $jukebox_binary, $safeFile );
+
+    exit;
+}
+
+# matt: init a rate limiter object
+sub initRateLimit
+{
+    my ($limit) = (@_);
+    my $limiter = {
+        limit => $limit, # bytes/sec
+        histdepth => 5, # seconds
+        ticks => POSIX::sysconf( &POSIX::_SC_CLK_TCK ), # clock rate
+        tbytes => 0, # sum of bytes in history
+        history => [],
+    };
+    return $limiter;
+}
+
+# matt: update rate status, sleep until rate is OK
+# uses bits from POSIX to avoid adding a dependency on Time::HiRes
+sub updateRateLimit
+{
+    my ($state, $bytes) = (@_);
+    my $now = (POSIX::times)[0];
+    my $oldest = $now - $state->{histdepth} * $state->{ticks};
+    # trim history
+    my $n;
+    for ($n = 0; $n <= $#{$state->{history}} and $state->{history}[$n][1] < $oldest; ++$n) {
+        $state->{tbytes} -= $state->{history}[$n][0];
+    }
+    @{$state->{history}} = @{$state->{history}}[$n .. $#{$state->{history}}];
+    push @{$state->{history}}, [$bytes, $now];
+    $state->{tbytes} += $bytes;
+    # use select for fine grained sleeps to avoid Time::HiRes again
+    my $tdelta = ($now - $state->{history}[0][1]) / $state->{ticks};
+    if ($tdelta > 0) {
+        my $crate = $state->{tbytes} / $tdelta;
+        if ($crate > $state->{limit}) {
+            # what's the ok delta for bytes we've sent
+            my $okdelta = $state->{tbytes} / $state->{limit};
+            # sleep until we've hit that time
+            my $stime = $okdelta - $tdelta;
+            select(undef, undef, undef, $stime);
+        }
+    }
+    # technically superfluous, but maybe useful to caller
+    return $state;
+}
+
+#
+#  Stream an audio file to the waiting client.
+#
+#  NOTE: Here we test for downsampling.
+#
+sub streamAudioFile
+{
+    my ( $data, $file ) = (@_);
+
+    #
+    # Just serve the file if downsampling isn't enabled at the
+    # server level.
+    #
+    if ( $down_enabled eq 0 )
+    {
+		$DEBUG && print "Downsampling disabled for : $file\n";
+		&serveFile( $data, $file );
+		exit;
+    }
+
+    # Only downsample if this IP is in the right range.
+    if ( &downsampleAddress( $connected_address ) )
+    {
+    	$DEBUG && print "Downsampling disabled for: $connected_address\n";
+		&serveFile($data, $file);
+		exit;
+    }
+
+    #
+    # Get the quality requested.
+    #
+    my $quality = $ARGUMENTS{"quality"};
+
+
+    #
+    # If the user hasn't chosen a level default to the admin-provided
+    # default if present.
+    #
+    if ( ( not defined( $quality ) ) ||
+	 ( $quality eq "" ) )
+    {
+	$quality = $default_quality;
+
+	if ( length( $default_quality ) )
+	{
+	    $DEBUG && print "Downsampling quality set to '$default_quality' per config\n";
+	}
+	else
+	{
+	    $DEBUG && print "Downsample disabled, users quality level is unset, and no default quality.\n";
+	}
+    }
+
+    #
+    # No supplied, or default, quality setup.
+    # Serve the file normally.
+    #
+    if ( ( not defined( $quality ) ) ||
+	 ( $quality eq "" ) )
+    {
+		&serveFile( $data, $file );
+		exit;
+    }
+
+    #
+    #  Here we have downsampling of some level enabled, but we don't know
+    # what it is yet.
+    #
+    #
+    my $suffix = &getSuffix( $file );
+    $suffix    = lc( $suffix );
+    my $configKey = "downsample_" . $quality . "_" . $suffix;
+
+    my $cmd = &getConfig( $configKey, "" );
+    if ( not( length( $cmd ) ) )
+    {
+		$DEBUG && print "Downsample disabled we didnt find a command for filetype '$configKey'\n";
+		serveFile( $data, $file );
+		exit;
+    }
+
+
+    #
+    # Expand the filename in the command line, taking care of
+    # any tricky quoting conditions.
+    #
+    my $safeFile = $file;
+    $safeFile    =~ s/([\"\$\\])/\\$1/g;
+    $safeFile    =~ s/\'/\'"'"\'/g;
+    $safeFile    = "'" . $safeFile . "'";
+
+
+    #
+    # Create a filename that is usable on disk without creating directorys.
+    #
+    # Create MD5 of the first 2048 bytes of the disk file.
+    #
+    $DEBUG && print "Creating MD5 digest\n";
+
+    my $head       = "";
+
+    open(MUSICHEAD, "<$file" );
+    # matt: need more than 2k of data for uniqueness
+    read(MUSICHEAD, $head, 4096);
+    close(MUSICHEAD);
+
+    my $md5_handle = gnump3d::MD5->new();
+    # matt: add filename to ensure uniqueness
+    $md5_handle->add($file);
+    $md5_handle->add($head);
+    my $cacheFile  = $md5_handle->hexdigest;
+
+    $DEBUG && print "Done - $cacheFile\n";
+
+    # matt: problem: this won't catch when encoding rules for a given
+    # quality change
+    $cacheFile .= "@".$quality;
+
+
+    #
+    # Insert the safely quoted filename into the command we run.
+    #
+    $cmd =~ s/\$FILENAME/$safeFile/g;
+
+    $DEBUG && print "Downsampling - running: '$cmd' for '$file' at level '$quality'\n";
+
+    #
+    #  Serve HTTP header for the downsampled file.
+    #
+    my $mime = $mime_cache{ lc( &getSuffix( $file ) ) };
+    if ( ! defined ( $mime ) )
+    {
+	$DEBUG && print "No mime type found for $file\n";
+	$mime = "text/html";
+    }
+
+    # matt: retrieve the rate now
+    my $ratelimit = getConfig($configKey . "_rate", 0);
+    # rate limit in config is in kbits/sec, convert it to bytes/sec
+    $DEBUG && print "Rate limit: $ratelimit kbit/sec\n";
+    $ratelimit *= 128; # / 8 * 1024
+    my $limiter = undef;
+    # create a rate limiter object for later use
+    $limiter = initRateLimit($ratelimit) if $ratelimit;
+
+    # matt: if we have a full cache file, serve it as a native file
+    if (-e "$down_cachedir/$cacheFile.full" && POSIX::access("$down_cachedir/$cacheFile.full", &POSIX::R_OK)) {
+        $DEBUG && print "Downsampling - full cache file found, streaming it\n";
+    	&serveFile( $data, "$down_cachedir/$cacheFile.full", { mimepath => $file, limiter => $limiter } );
+    	exit;
+    }
+
+    #
+    # Get header without Content-length.
+    #
+    my $header   = getHTTPHeader( 200, $mime, $file, { NoContentLength => 1 } );
+
+    &sendData( $data, $header);
+
+
+    my $size = 0;
+    my $buff = "";
+
+    my $writecache = 0;
+    my $pre_exit   = 0;
+
+    if (opendir(CACHECHECK, $down_cachedir)) {
+        my $cachesize = 0;
+        foreach(grep {!/^\.{1,2}/} readdir(CACHECHECK)) {
+                $cachesize += -s $down_cachedir."/".$_;
+        }
+        close(CACHECHECK);
+        if ($cachesize > ($down_cache_limit*1024*1024)) {
+                print "Cache is too big. Write something to clean up!";
+                print "Cache is $cachesize bytes. ". $down_cache_limit*1024*1024 ." is allowed.\n";
+        } else {
+                print "Cache is $cachesize bytes. ". $down_cache_limit*1024*1024 ." is allowed.\n";
+        }
+        open( CACHING, "+>$down_cachedir/$cacheFile" );
+        $writecache = 1;
+    }
+    open( SAMPLE, "$cmd|" )
+        or die "Cannot run : '$cmd $file' : $!";
+
+    while ($size = read(SAMPLE, $buff, 2048) )
+    {
+        # check if the client closed the connection
+        # if it did, kill downsampler to save cycles
+        my $rin = '';
+        my $rout;
+        vec($rin,fileno($data),1) = 1;
+        select($rout=$rin, undef, undef, 0);
+        if(vec($rout,fileno($data),1)) {
+	    $HTTP_CODE = 410;
+	    $pre_exit = 1;
+            last;
+        }
+
+	print $data $buff;
+	print CACHING $buff if ($writecache == 1);
+	$SERVED_SIZE += $size;
+
+	# matt: rate limiting
+	updateRateLimit($limiter, length($buff)) if $limiter;
+    }
+    close( SAMPLE );
+    close( CACHING ) if ($writecache == 1);
+    rename("$down_cachedir/$cacheFile", "$down_cachedir/$cacheFile.full") if ($writecache == 1 && $pre_exit == 0);
+    close( $data );
+}
+
+
+#
+#  Serve a file, making correct use of the mime-type
+#
+sub serveFile
+{
+    my ($data, $path, $extra ) = (@_);
+    $extra = {} if !defined $extra;
+
+    # matt: allow getting mime type for a different filename
+    # this is for when serving a cached downsampling
+    my $mime = $mime_cache{ lc( &getSuffix( $extra->{mimepath} || $path ) ) };
+
+    if ( ! defined ( $mime ) )
+    {
+	warn "No mime type found for $path\n";
+	$mime = "text/html";
+    }
+
+    my $header   = &getHTTPHeader( 200, $mime, $path, { mimepath => $extra->{mimepath}, range => $RANGE } );
+    &sendData( $data, $header);
+
+    open( FILE, "<" . $path ) or warn "Cant open '$path' : $!";
+    binmode( FILE );
+
+    my $size = 0;
+    my $buff = "";
+
+
+    # Seek if we're supposed to.
+    if ( length( $RANGE ) && ( $RANGE > 0 ) )
+    {
+      $DEBUG && print "SKIPPING $RANGE bytes\n";
+      read(FILE, $buff, $RANGE);
+      $buff = "";
+    }
+
+    #
+    # Read in the file in 2k chunks, and serve it.
+    #
+    while ($size = read(FILE, $buff, 2048) )
+    {
+        # check if the client closed the connection
+        # if it did, kill server to save cycles - log this
+	# as HTTP code 410
+        my $rin = '';
+        my $rout;
+        vec($rin,fileno($data),1) = 1;
+        select($rout=$rin, undef, undef, 0);
+        if(vec($rout,fileno($data),1)) {
+	    $HTTP_CODE = 410;
+            last;
+        }
+
+	print $data $buff;
+	$SERVED_SIZE += $size;
+
+	# matt: rate limiting
+	updateRateLimit($extra->{limiter}, length($buff)) if $extra->{limiter};
+    }
+    close( FILE );
+    close( $data );
+}
+
+
+#
+# Parse the mime.types file into the global %mime_cache hash
+#
+# This code was taken from Pabache - a simple Perl HTTP server
+#
+#     http://freshmeat.net/projects/pabache/
+#
+sub mkcache
+{
+    my($type, $end, $i, $x);
+
+    if (open(MM, "<$mime_file" ) )
+    {
+	while (defined($i = <MM>))
+	{
+	    while ($i =~ /\t\t/)
+	    {
+		$i =~ s/\t\t/\t/;
+	    }
+	    ($type, $end) = split(/\t/, $i);
+	    if ($end)
+	    {
+		chomp($end);
+	    }
+	    if ($type)
+	    {
+		chomp($type); $type=~ tr/ //d;
+	    }
+	    if ($end)
+	    {
+		foreach $_ (split(/ /, $end))
+		{
+		    $mime_cache{$_} = $type;
+		}
+	    }
+	}
+	close(MM);
+    }
+    else
+    {
+	return 1;
+    }
+}
+
+
+#
+#  Send some data to the client.
+#
+#  This is here entirely so that we can keep track of the number of bytes
+# transferred in our logfile.
+#
+sub sendData
+{
+    my ($socket, $tosend) = (@_);
+
+    $SERVED_SIZE += length( $tosend );
+
+    print $data $tosend;
+}
+
+
+
+#
+#  Make up the GUI interface for a directory.
+#
+#  This code is suboptimal, but it's constrained fairly tightly by
+# the pre-existing template format.
+#
+#
+sub serveDirectory
+{
+    my ($dir, $theme) = (@_);
+
+    my @lines = &getThemeFile( $theme, "index.html" );
+
+
+    #
+    # Allow per-connection sort order.
+    #
+    $sort_order = $ARGUMENTS{"sort_order" } || $sort_order;
+
+    #
+    # The path to the current directory as used in the links.
+    #
+    my $path = $dir;
+    if ($path =~ /$ROOT(.*)/ )
+    {
+      $path = $1;
+    }
+    if ( $path =~ /(.*)\//)
+    {
+      $path = $1;
+    }
+
+    #
+    # The total text we return
+    #
+    my $total = "";
+
+    # Total up things we find.
+    my $totalFiles     = 0;
+    my $totalPlaylists = 0;
+    my $totalSubdirs   = 0;
+    my $totalMovies    = 0;
+
+    my $directory = $path;
+    if ( ! length( $directory ) )
+    {
+	$directory = "/";
+    }
+
+    #
+    # Process the template file.
+    #
+    foreach my $line ( @lines )
+    {
+	#
+	# Make global substitutions.
+	#
+	$line =~ s/\$HOSTNAME/$host/g;
+	$line =~ s/\$VERSION/$VERSION/g;
+	$line =~ s/\$RELEASE/$RELEASE/g;
+	$line =~ s/\$DIRECTORY/$directory/g;
+	$line =~ s/\$META/$meta_tags/g;
+
+	#
+	# Now handle the special sections.
+	#
+	if ( $line =~ /(.*)\$BANNER(.*)/ )
+	{
+	    # Insert banner;
+	    my $pre  = $1;
+	    my $post = $2;
+
+	    $total .= $pre;
+
+	    $total .= &getBanner( $path );
+	    $total .= $post;
+	}
+	elsif ( $line =~ /(.*)\$DIRECTORIES(.*)/ )
+	{
+	    #
+	    # Insert subdirectories;
+	    #
+	    #  Make sure that we pay attention to the 'directory_format'
+	    # setting.
+	    #
+	    my $pre  = $1;
+	    my $post = $2;
+	    $total .= $pre;
+
+	    #
+	    # Find all the subdirs.
+	    #
+	    my @files = &dirsInDir( $dir );
+	    @files    = &sortDirectories( @files );
+
+	    foreach my $file (@files)
+	    {
+		# Increase count.
+		$totalSubdirs += 1;
+
+		#
+		# Get ready to insert variables into the `directory_format`
+		# template string.
+		#
+		my $link = "$path/$file/";
+		$link    = &urlEncode( $link );
+
+		my $name = $file;
+		my $rec  = "<a href=\"${link}recurse.m3u\">$play_rec</a>";
+		my $row;
+
+		if ( $totalSubdirs % 2 == 0 )
+		{
+		    $row = $dir_format;
+		}
+		else
+		{
+		    $row = $dir_format2;
+		}
+
+		#
+		# Insert in the 'new_format' if relevent
+		#
+
+		# Figure out the mtime if possible.
+		my @fstat;
+		if( -l "$dir/$file" ) {  # $file is a link
+		  @fstat = lstat( "$dir/$file" )
+		} else {
+		  @fstat = stat( "$dir/$file" );
+		}
+
+		if (($fstat[9] > $tagCache->getCacheMod()) ||
+		    ($fstat[9] > (time() - ($new_days * 86400)))) {
+		  $row =~ s/\$NEW/$new_format/g;
+		} else {
+		  $row =~ s/\$NEW//g;
+		}
+
+		#
+		# Only calculate the number of songs if necessary.
+		# Optimization.
+		#
+		if ( $row =~ /\$SONG_COUNT/ )
+		{
+		    my @subfiles = &filesInDir( $dir . $file . "/" );
+
+		    #
+		    # Strip out things like .title files.
+		    #
+		    my @totalFiles = ();
+		    foreach my $sf (@subfiles)
+		    {
+			my $valid = 0;
+			if  ( $FILE_TYPES->isAudio( $sf )    ||
+			      $FILE_TYPES->isPlaylist( $sf ) ||
+			      $FILE_TYPES->isMovie( $sf ) )
+			{
+			    $valid ++;
+			}
+
+			if ( $valid )
+			{
+			    push @totalFiles, $sf;
+			}
+		    }
+
+		    my $count = $#totalFiles + 1;
+		    if ( $count == 1 )
+		    {
+			$count = "1 song";
+		    }
+		    elsif ($count > 0 )
+		    {
+			$count = "$count songs";
+		    }
+		    else
+		    {
+			$count = "";
+		    }
+		    $row =~ s/\$SONG_COUNT/$count/g;
+		}
+		if ( $row =~ /\$DIR_COUNT/ )
+		{
+		    my @subfiles = &dirsInDir( "$dir/$file" );
+
+		    my $count = $#subfiles + 1;
+		    if ($count == 1 )
+		    {
+			$count = "1 subdirectory";
+		    }
+		    elsif ( $count > 0 )
+		    {
+			$count = "$count subdirectories";
+		    }
+		    else
+		    {
+			$count = "";
+		    }
+		    $row =~ s/\$DIR_COUNT/$count/g;
+
+		}
+
+		#
+		#  Do the interpolation.
+		#
+		$row =~ s/\$LINK/$link/g;
+		$row =~ s/\$DIR_NAME/$name/g;
+		$row =~ s/\$RECURSE/$rec/g;
+		$row =~ s/\$LINK/$link/g;
+
+		#
+		# Add to the text we're building up.
+		$total .= $row;
+	    }
+
+	    $total .= $post;
+	}
+	elsif ( $line =~ /(.*)\$SONGS(.*)/ )
+	{
+	    #
+	    # Insert songs into the output text.
+	    #
+	    my $pre  = $1;
+	    my $post = $2;
+	    $total .= $pre;
+
+
+	    #
+	    # Read all the files.
+	    #
+	    my @files = &filesInDir( $dir );
+
+	    #
+	    # The files we are going to display.
+	    #
+	    my @DISPLAY = ( );
+
+	    $tagCache->setFormatString( $song_format );
+
+	    foreach my $file (@files)
+	    {
+		# Skip non-audio files.
+		next if ( not  $FILE_TYPES->isAudio( $file ) );
+
+		push @DISPLAY, $file;
+		$DEBUG && print "Kept $file\n";
+	    }
+
+	    $totalFiles = $#DISPLAY + 1;
+
+	    #
+	    # Format all the song tags in one go.
+	    #
+	    # This is a speed optimization, rather than fetching each
+	    # song detail from the cache we pull them out en masse,
+	    # leaving us with a HASH.
+	    #
+	    # The hash has keys of filenames, and values of the
+	    # tags to be displayed.
+	    my %TAGS     = $tagCache->formatMultipleSongTags( @DISPLAY );
+
+
+	    #
+	    # Pull out the filenames and sort them according to sort
+	    # order.
+	    #
+	    # Yes this will break a little bit of the optimization, but
+	    # things should be cached anyway ..
+	    my @FULLNAMES= keys %TAGS ;
+
+	    # If no sort order is set default to filename.
+	    if ( !length( $sort_order ) )
+	    {
+		$sort_order = '$FILENAME';
+	    }
+
+	    #
+	    #  This is the key to sorting.
+	    #
+	    #  The global format string the tag cache object contains is
+	    # that which is being used for display.
+	    #
+	    # Sort the files by the given format string.
+	    #
+	    my $sorter = gnump3d::sorting->new( );
+	    $sorter->setTagCache( $tagCache );
+	    @FULLNAMES = &sortFiles( $sort_order, @FULLNAMES );
+
+	    #
+	    #  Here we have a list of files, referenced by complete path
+	    # stored in '@FULLNAMES' we want to create the output HTML
+	    # to display that collection of files now.
+	    #
+	    my $html = &formatFileListOutput( @FULLNAMES );
+
+	    $total .= $html;
+	    $total .= $post;
+	}
+	elsif ( $line =~ /(.*)\$PLAYLISTS(.*)/ )
+	{
+	    #
+	    # Insert any playlists into the output text.
+	    #
+	    my $pre  = $1;
+	    my $post = $2;
+	    $total .= $pre;
+
+
+	    #
+	    # Read all the files.
+	    #
+	    my @files = &filesInDir( $dir );
+	    foreach my $file (@files)
+	    {
+		next if ( not $FILE_TYPES->isPlaylist( $file ) );
+
+		# Increase count.
+		$totalPlaylists += 1;
+
+		# Strip preceeding folders
+		$file =~ s/^$ROOT\/(.*\/)*//;
+
+		# Get the display text
+		my $display = $file;
+		if ( $file =~ /(.+)\.[^\.]+$/ )
+		{
+		    $display = $1;
+		}
+
+		#
+		# Build up the text to insert into the file lists.
+		#
+		my $link = &urlEncode( $file );
+
+		#
+		# Do the interpolation.
+		my $output;
+
+		if ( $totalPlaylists % 2 == 0 )
+		{
+		  $output = $file_format;
+		}
+		else
+		{
+		  $output = $file_format2;
+		}
+		$output    =~ s/\$LINK/$link/g;
+		$output    =~ s/\$PLAINLINK/$link/g;
+		$output    =~ s/\$SONG_FORMAT/$display/g;
+
+		#
+		# Add the playlist to the display.
+		$total .= $output;
+		$total .= "\n";
+	    }
+	    $total .= $post;
+	}
+	elsif ( $line =~ /(.*)\$MOVIES(.*)/ )
+	{
+	    #
+	    # Insert movies into the output text.
+	    #
+	    my $pre  = $1;
+	    my $post = $2;
+	    $total .= $pre;
+
+
+	    #
+	    # Read all the files.
+	    #
+	    my @files = &filesInDir( $dir );
+	    foreach my $file (@files)
+	    {
+		next if ( not $FILE_TYPES->isMovie( $file ) );
+
+        # Strip directories for movies aswell
+        $file =~ s/^$ROOT\/(.*\/)*//;
+
+		# Strip directories for movies aswell
+		$file =~ s/^$ROOT\/(.*\/)*//;
+
+		# Increase count.
+		$totalMovies += 1;
+
+		# Get the display to use for the movie, from any
+		# .title file which might be present.
+		my $display = $file;
+
+		#
+		# Read the display information from the .title file.
+		#
+		if ( -e  $dir . "/" . $display . ".title" )
+		{
+		    #
+		    #  Display the contents of the .title file.
+		    #
+		    $display = join( "\n", &readFile( $dir . "/" .  $display . ".title" ) );
+
+		}
+		else
+		{
+		    #
+		    # No .title file - so we just show the
+		    # filename.
+		    #
+		    if ( $display =~ /^(.*)\.(.*)$/ )
+		    {
+			# Strip suffix
+			$display = $1;
+		    }
+		    if ( $display =~ /^(.*)\/(.*)$/ )
+		    {
+			# Strip directory
+			$display = $2;
+		    }
+
+		    # Make it safe for display.
+		    $display = &urlEncode( $display );
+
+		}
+
+		#
+		# Build up the text to insert into the file lists.
+		#
+		my $link = $path ."/" . $file;
+
+		# URL Encode link to movie
+		$link = &urlEncode( $file );
+
+		# Plain link
+		my $plink= $path . "/" . $file;
+		$plink = &urlEncode( $plink );
+
+		#
+		# Do the interpolation.
+		my $output;
+
+		if ( $totalMovies % 2 == 0 )
+		{
+		  $output = $file_format;
+		}
+		else
+		{
+		  $output = $file_format2;
+		}
+
+		$output    =~ s/\$LINK/$link/g;
+		$output    =~ s/\$PLAINLINK/$plink/g;
+		$output    =~ s/\$SONG_FORMAT/$display/g;
+
+		#
+		# Add the song to the display.
+		$total .= $output;
+		$total .= "\n";
+
+	    }
+
+	    $total .= $post;
+	}
+	else
+	{
+	    $total .= $line ;
+	}
+    }
+
+    #
+    # Remove empty sections.
+    #
+    if ( $totalPlaylists eq 0 )
+    {
+	$total =~ s/<PLAYLISTS>.*<\/PLAYLISTS>//gsx;
+    }
+    else
+    {
+      $total =~ s/<\/?PLAYLISTS>//g;
+    }
+
+    if ( $totalFiles eq 0 )
+    {
+      $total =~ s/<FILES>.*<\/FILES>//gsx;
+    }
+    else
+    {
+      $total =~ s/<\/?FILES>//g;
+    }
+
+    if ( $totalSubdirs eq 0 )
+    {
+      $total =~ s/<DIRS>.*<\/DIRS>//gsx;
+    }
+    else
+    {
+      $total =~ s/<\/?DIRS>//g;
+    }
+
+    if ( $totalMovies eq 0 )
+    {
+      $total =~ s/<MOVIES>.*<\/MOVIES>//gsx;
+    }
+    else
+    {
+      $total =~ s/<\/?MOVIES>//g;
+    }
+
+    #
+    # Return the directory contents as a formatted pretty HTML text file.
+    #
+    return ($total);
+}
+
+
+#
+#  Format a collection of tracks for output.
+#
+sub formatFileListOutput
+{
+  my ( @FILES ) = ( @_ );
+
+  my $total = "";
+  my $file_counter = 0;
+
+  # The hash has keys of filenames, and values of the
+  # tags to be displayed.
+  my %TAGS = $tagCache->formatMultipleSongTags( @FILES );
+
+  # Modify the link if necessary.
+  my $suffix = "";
+  if ( $always_stream )
+  {
+      $suffix = ".m3u";
+  }
+
+
+  #
+  # Interpolate each given file.
+  #
+  foreach my $key ( @FILES )
+  {
+      # Get the display text
+      my $display = $TAGS{ $key };
+
+      if ( $key =~ /^$ROOT(.*)/ )
+      {
+	  $key = $1;
+      }
+
+      #
+      # Build up the text to insert into the file lists.
+      #
+      my $link  = $key . $suffix;
+      $link     = &urlEncode( $link );
+
+      my $plink = $key;
+      $plink    = &urlEncode( $plink );
+
+      #
+      # Do the interpolation.
+      my $output;
+
+      if ( $file_counter % 2 == 0 )
+      {
+	$output = $file_format;
+      }
+      else
+      {
+	$output = $file_format2;
+      }
+
+      $output    =~ s/\$LINK/$link/g;
+      $output    =~ s/\$PLAINLINK/$plink/g;
+      $output    =~ s/\$SONG_FORMAT/$display/g;
+
+      #
+      # Add the song to the display.
+      $total .= $output;
+      $total .= "\n";
+
+      $file_counter += 1;
+    }
+
+    return( $total );
+}
+#
+#  Format the song tags via the currently defined template string.
+#
+sub getSongDisplay
+{
+  my ( $file, $format ) = ( @_ );
+
+  # Remove double slashes, needed because the formatMultipleSongTags
+  # does this, and if we don't the $TAGS{ $file } lookup will fail
+  # because the filename stored (without double '/') doesn't match
+  # the $file variable here (possibly containing double '/').
+  while( $file =~ /\/\// )
+  {
+      $file =~ s/\/\//\//g;
+  }
+
+
+  #
+  # If we're hiding song tags just display the filename
+  if ( $hide_song_tags )
+  {
+    if ( $file =~ /(.*)\/(.*)/ )
+    {
+    	$file = $2;
+    }
+    if ( $file =~ /(.*)\.(.*)/ )
+    {
+    	$file = $1;
+    }
+    return( $file );
+  }
+  else
+  {
+      my @ARRAY = ( );
+      push @ARRAY, $file;
+
+      my %TAGS     = $tagCache->formatMultipleSongTags( @ARRAY );
+      return( $TAGS{ $file } );
+  }
+  # NOT REACHED
+}
+
+#
+#  Read a given .html file from the given theme directory.
+#
+#  If the theme directory doesn't exist return the file from
+# the default directory.
+#
+#
+#  (We also interpolate the standard variables).
+#
+#
+sub getThemeFile
+{
+    my ( $theme, $file ) = (@_);
+
+    my $themeFile = "";
+
+    if ( defined( $theme ) && ( length( $theme ) ) )
+    {
+	$themeFile = $theme_dir . "/" . $theme . "/$file";
+	if ( not -e $themeFile )
+	{
+	    $themeFile = $theme_dir . "/default/$file";
+	}
+    }
+    else
+    {
+	$themeFile = $theme_dir . "/default/$file";
+    }
+
+    if ( not -e $themeFile )
+    {
+	$DEBUG && print "The '$file' doesn't exist for the theme '$theme'\n";
+	exit;
+    }
+
+
+    my @lines = &readFileWithExpansion( $themeFile );
+
+    return( @lines );
+}
+
+
+#
+#  Return a HTML banner for the given directory.
+#
+sub getBanner
+{
+    my ( $dir ) = (@_);
+    my $prev = "";
+
+    my $banner = "[ <a href=\"/\">Home</a>";
+
+    my @list = splitPath( $host, $dir );
+
+    foreach my $component ( @list )
+    {
+	if ( $component =~ /$host(.*)/ )
+	{
+	    my $path = $1;
+	    if ( $path =~ /(.*)\/(.*)\/+/ )
+	    {
+		$path = $2;
+	    }
+	    if ( $path ne "/" )
+	    {
+			$component =~ s/$host//g;
+			$component = &urlEncode( $component );
+			$banner .= " &middot; <a href=\"http://$host$component\">$path</a>";
+	    }
+	}
+    }
+
+    if ( $dir ne '/prefs/' ) {
+        #
+        # Interpolate links - chopping out trailing '/' if necessary.
+        #
+        $dir =~ s/(.*)\/?/$1/;
+        $dir = &urlEncode( $dir );
+        $banner .= " | <a href=\"$dir/recurse.m3u\">$play_rec</a>";
+    }
+    $banner .= " ]";
+
+    return( $banner );
+}
+
+
+sub downsampleAddress
+{
+    my ($client) = (@_);
+
+    my $go = &getConfig( "downsample_clients", "none" );
+    my $nogo  = &getConfig( "no_downsample_clients", "all" );
+
+    #
+    # Multiple entries may be seperated by ';' characters.
+    #
+    my @go_array = split( /;/, $go );
+    my @nogo_array = split( /;/, $nogo );
+
+    my $doit = 0;
+
+    #
+    #  Test each allowed pattern first.
+    #
+    foreach my $test ( @go_array )
+    {
+	if ( &matchIPAddress( $test, $client ) )
+	{
+	    $doit = 1;
+	}
+    }
+
+    #
+    #  But then allow the 'denied' list to override any
+    # allowed client.
+    #
+    foreach my $test ( @nogo_array )
+    {
+	if ( &matchIPAddress( $test, $client ) )
+	{
+	    $doit = 0;
+	}
+    }
+    return ( not $doit );
+}
+
+#
+#  Test to see if the given IP address should be banned,
+# or granted access to our server.
+#
+#  Tests 'allowed_clients' and 'denied_clients'.
+#
+#  NOTE: denied_clients overrides allowed_clients.
+#
+sub bannedAddress
+{
+    my ($client) = (@_);
+
+    my $allow = &getConfig( "allowed_clients", "all" );
+    my $deny  = &getConfig( "denied_clients", "none" );
+
+    #
+    # Multiple entries may be seperated by ';' characters.
+    #
+    my @good = split( /;/, $allow );
+    my @bad  = split( /;/, $deny );
+
+    my $allowed = 0;
+
+    #
+    #  Test each allowed pattern first.
+    #
+    foreach my $test ( @good )
+    {
+	if ( &matchIPAddress( $test, $client ) )
+	{
+	    $allowed = 1;
+	}
+    }
+
+    #
+    #  But then allow the 'denied' list to override any
+    # allowed client.
+    #
+    foreach my $test ( @bad )
+    {
+	if ( &matchIPAddress( $test, $client ) )
+	{
+	    $allowed = 0;
+	}
+    }
+    return ( not $allowed );
+}
+
+
+#
+# Match an IP address against a pattern.
+#
+sub matchIPAddress
+{
+    my ($pattern, $address ) = ( @_ );
+
+    # Strip leading and trailing whitespace.
+    $pattern =~ s/^\s+//;
+    $pattern =~ s/\s+$//;
+    $address =~ s/^\s+//;
+    $address =~ s/\s+$//;
+
+	# Case insensitive comparisons.
+    if ( $pattern =~ /^all$/i )
+    {
+	return 1;
+    }
+    if ( $pattern =~ /^none$/i )
+    {
+	return 0;
+    }
+
+    #
+    # Split the address for wildcard matching.
+    #
+    my $ip = new gnump3d::IP $address;
+    if ($ip->within(new gnump3d::IP $pattern, ))
+    {
+	return 1;
+    }
+    else
+    {
+	return 0;
+    }
+}
+
+
+
+#
+#  Break a Unix path into a list of parent entries.
+#
+sub splitPath
+{
+    my ( $prefix, $path ) = (@_);
+    $path .= "/";
+    $path =~ s|//|/|g;
+
+    my @list = "";
+    while( $path =~ /(.*)\/(.*)/ )
+    {
+	$path = $1;
+	push @list, $prefix . $path . "/";
+    }
+
+    return( reverse( @list ) );
+}
+
+
+
+#
+#  Load all our plugins
+#
+sub loadAllPlugins
+{
+    my $count = 0;
+
+    #
+    # Get all the possible plugin files.
+    #
+    my @plugins = sort( glob( $plugin_dir . "/*.pm" ) );
+
+    #
+    # Keep count of the plugins.
+    #
+    foreach my $plugin (@plugins)
+    {
+	eval { require( $plugin ); };
+
+	$count += 1;
+    }
+
+    return( $count );
+}
+
+
+
+#
+#  Show the name and version of all our loaded plugins.
+#
+sub dumpAllPlugins
+{
+    #
+    # Use a hash temporarily, purely to align the output nicely.
+    #
+    my %info;
+
+    foreach my $plugin (@callbacks)
+    {
+	#
+	# Create new instance.
+	#
+	if ( UNIVERSAL::can($plugin, 'new' ) )
+	{
+	    my $module  = $plugin->new();
+
+	    #
+	    # Now work with it.
+	    #
+	    my $author  = '';
+	    if ( UNIVERSAL::can( $plugin, 'getAuthor' ) )
+	    {
+		$author = $module->getAuthor();
+	    }
+
+	    my $version = '';
+	    if ( UNIVERSAL::can( $plugin, 'getVersion' ) )
+	    {
+		$version = $module->getVersion();
+	    }
+
+	    $info{ $version } = $author;
+	}
+	else
+	{
+	    $DEBUG && print "Plugin $plugin has no 'new' method!\n";
+	}
+    }
+
+    my $max = 0;
+    foreach my $v ( keys( %info ) )
+    {
+	$max = length( $v ) if (length($v) > $max );
+    }
+
+    #
+    # Now do the printing.
+    #
+    foreach my $v ( sort keys( %info ) )
+    {
+	my $disp = $v;
+
+	while( length( $disp ) < ( $max + 1 ) )
+	{
+	    $disp .= " ";
+	}
+	print $disp . $info{ $v } . "\n";
+    }
+}
+
+
+#
+#  Register a plugin in the global namespace.   This is called
+# by the libraries inside lib/gnummp3d/plugins/
+#
+sub register_plugin
+{
+    my $class = shift;
+    push @callbacks, $class;
+    $DEBUG && print "Registered plugin : $class\n" ;
+}
+
+
+#
+#  If any of the command line options were intend to overwride the
+# configuration files contents then perform those overwrides here.
+#
+sub overideConfigFile
+{
+  if ( length( $CMD_ROOT ) )
+    {
+      $ROOT = $CMD_ROOT;
+    }
+  if ( length( $CMD_PORT ) )
+    {
+      $PORT = $CMD_PORT;
+    }
+  if ( length( $CMD_THEME_DIR ) )
+    {
+      $theme_dir = $CMD_THEME_DIR;
+    }
+  if ( length( $CMD_PLUGIN_DIR ) )
+    {
+      $plugin_dir = $CMD_PLUGIN_DIR;
+    }
+  if ( length( $CMD_DEFAULT_THEME ) )
+    {
+      $default_theme = $CMD_DEFAULT_THEME;
+    }
+}
+
+
+
+#
+#  Parse our command line arguments, and set some of
+# our global variables to indicate how the server should
+# start up - or change important settings.
+#
+sub parseArguments
+{
+
+  #
+  #  Setup the default configuration file which will be read
+  # in the absence of command line flags.
+  #
+  #  A users personal file overrides the system wide one, this
+  # is assumed to be: ~/.gnump3drc
+  #
+  if ( ( $ENV{"HOME"} ) &&
+       ( -e $ENV{"HOME"} . "/.gnump3drc" ) )
+  {
+    $CONFIG_FILE = $ENV{"HOME"} . "/.gnump3drc";
+  }
+  elsif ( -e "gnump3d.conf" )
+  {
+      # This is mainly here for Windows users.
+      $CONFIG_FILE = "gnump3d.conf";
+  }
+  elsif ( -e "/etc/gnump3d/gnump3d.conf" )
+  {
+      # None of the others are present, use the system wide one.
+      $CONFIG_FILE = "/etc/gnump3d/gnump3d.conf";
+  }
+
+
+  GetOptions(
+	     "background", \$BACKGROUND,
+	     "config=s", \$CONFIG_FILE,
+	     "debug", \$DEBUG,
+	     "fast", \$FAST_START,
+	     "help", \$SHOW_HELP,
+	     "version", \$SHOW_VERSION,
+	     "quiet", \$QUIET,
+	     "plugin=s", \$CMD_PLUGIN_DIR,
+	     "plugin-dir=s", \$CMD_PLUGIN_DIR,
+	     "theme-dir=s", \$CMD_THEME_DIR,
+	     "default-theme=s", \$default_theme,
+	     "dump-plugins", \$SHOW_PLUGINS,
+	     "port=s", \$CMD_PORT,
+	     "root=s", \$CMD_ROOT,
+	     "lang=s", \$CMD_LANG
+	    );
+
+
+    #
+    # Set the possibly modified language as soon as possible
+    # so that '--help' shows the correct language.
+    #
+    $literals->loadLanguage( $CMD_LANG );
+
+    if ( $BACKGROUND )
+    {
+	# Running in the background implies running
+	# quietly.
+	$QUIET = 1;
+    }
+    if ( $SHOW_HELP )
+    {
+        my $helpText = $literals->get( "HELP_TEXT" );
+	print $helpText;
+	exit;
+    }
+    if ( $SHOW_VERSION )
+    {
+        my $versionText = $literals->get( "VERSION_TEXT" );
+	print $versionText;
+	exit;
+    }
+    if ( $SHOW_PLUGINS )
+    {
+        #
+        # Read in the configuration file.
+        &readConfigFile();
+
+        #
+        # Allow the command line flags to override the configuration file.
+        &overideConfigFile();
+
+	#
+	# Make sure that the plugin directory exists.
+	#
+	if ( not -d $plugin_dir )
+	{
+	    my $pluginError = $literals->get( "PLUGIN_DIR_MISSING" );
+	    print $pluginError;
+	    exit;
+	}
+
+	#
+	# Get all the possible plugin files.
+	#
+	my $found = loadAllPlugins();
+
+	if ( $found eq 0 )
+	{
+	    my $none = $literals->get( "NO_PLUGINS" );
+	    print $none;
+	    exit;
+	}
+	else
+	{
+	    #
+	    # Display all plugin information.
+	    #
+	    dumpAllPlugins();
+	}
+	exit;
+    }
+}
+
+
+#
+#  Read the configuration variables from the specified configuration file.
+#
+#  If testing is enabled then allow the contents of environmental variables
+# to override those specified in the file.
+#
+sub readConfigFile
+{
+  if ( ! -e $CONFIG_FILE )
+  {
+      my $configError = $literals->get( "CONFIG_MISSING" );
+      print $configError;
+      exit;
+  }
+
+  #
+  # Initialize ourself from the configuration file.
+  #
+  &readConfig( $CONFIG_FILE );
+
+  #
+  # Main settings.
+  #
+  $ROOT          = getConfig( "root", "/home/mp3" );
+  $PORT          = getConfig( "port", 8888 );
+  $bind_address  = getConfig( "binding_host", "" );
+  $host          = getConfig( "hostname", "localhost" );
+  $theme_dir     = getConfig( "theme_directory", "/usr/share/gnump3d" );
+  $plugin_dir    = getConfig( "plugin_directory",  "/usr/lib/perl5/gnump3d/plugins" );
+  $always_stream = getConfig( "always_stream", 1 );
+  $access_log    = getConfig( "logfile", "/var/log/gnump3d/access.log" );
+  $error_log     = getConfig( "errorlog", "/var/log/gnump3d/error.log" );
+  $truncate_logs = getConfig( "truncate_log_file", 0 );
+  $client_host   = getConfig( "use_client_host", 1 );
+  $default_theme = getConfig( "theme", "default" );
+  $TIMEOUT       = getConfig( "read_time", 10 );
+  $STATSPROG     = getConfig( "stats_program", "/usr/bin/gnump3d-top" );
+  $INDEXPROG     = getConfig( "index_program", "/usr/bin/gnump3d-index" );
+  $STATSARGS     = getConfig( "stats_arguments", "" );
+  $play_rec      = getConfig( "play_recursively_text",  "Play" );
+  $mime_file     = getConfig( "mime_file",  "/etc/gnump3d/mime.types" );
+  $file_types    = getConfig( "file_types",  "/etc/gnump3d/file.types" );
+  $enable_browse = getConfig( "enable_browsing", 1 );
+  $sort_order    = getConfig( "sort_order", '$FILENAME' );
+
+  #
+  #  Make sure 'root' is specified using '/' characters, not '\' under
+  # windows.
+  #
+  $ROOT =~ s/\\/\//g;
+
+  #
+  #  For use by the '/now/' plugin.
+  #
+  $NOW_PLAYING_PATH = getConfig( "now_playing_path", '/var/cache/gnump3d/serving' );
+
+  #
+  # Downsampling
+  #
+  $down_enabled    = getConfig( "downsample_enabled", 0 );
+  $down_cachedir   = getConfig( "downsample_cachedir", 0 );
+  $down_cache_limit= getConfig( "downsample_cachedir_sizelimit", 0 );
+  $default_quality = getConfig( "default_quality", "" );
+
+  #
+  # Display formats.
+  #
+  $dir_format	     = getConfig( "directory_format", "" )
+    || die "No directory_format" ;
+  $file_format	     = getConfig( "file_format", "" )
+    || die "No file_format";
+  $song_format	     = getConfig( "song_format", "" )
+    || die "No song_format";
+
+  #
+  # For alternate rows.
+  #
+  $dir_format2	     = getConfig( "directory_format2", $dir_format);
+  $file_format2	     = getConfig( "file_format2", $file_format);
+
+  #
+  # Other formats.
+  #
+  $new_format	     = getConfig( "new_format", "<b>New</b>" );
+  $new_days	     = getConfig( "new_days", 7 );
+  $hide_song_tags    = getConfig( "hide_song_tags", 0 );
+  $disable_tag_cache = getConfig( "disable_tag_cache", 0 );
+  $advanced_playlist = getConfig( "advanced_playlists", 1 );
+  $seperate_folders  = getConfig( "seperate_folders", 0 );
+
+  # Tag cache
+  $tag_cache   = getConfig( "tag_cache", "" );
+
+  #
+  # Experimental features.
+  #
+  $jukebox        = getConfig( "jukebox_mode", 0 );
+  $jukebox_binary = getConfig( "jukebox_player", "/usr/bin/mpg123" );
+  if ( $jukebox )
+  {
+     $always_stream = 0;
+  }
+
+
+  #
+  # Optional meta-tags to include.
+  #
+  $meta_tags = getConfig( "add_meta_tag", "" );
+}
+
+
+#
+#  Strip "/../" from paths.
+#
+sub sanitizePath
+{
+    my ($path) = shift;
+
+    #
+    #  Filter out "/../".  Repeatedly.
+    #
+    while ( $path =~ /(.*)[\\\/]\.\.[\\\/](.*)/ )
+    {
+        $path = $1 . $2;
+    }
+    while ( $path =~ /(.*)([\\\/][\\\/]+)(.*)/ )
+    {
+        $path = $1 . "/" . $3;
+    }
+
+    return( $path );
+}
+
+
+
+#
+#  Make some simple checks that the settings are reasonable.
+#
+sub sanityCheck
+{
+    #
+    # Test for MP3 root directory.
+    #
+    if ( ! -x $ROOT ) {
+	my $error = $literals->get( "ROOT_MISSING" );
+	print $error;
+	exit;
+    }
+
+    #
+    # Test that the theme directory exists.
+    #
+    if ( ! -d $theme_dir ) {
+	my $error = $literals->get( "THEME_DIR_MISSING" );
+	print $error;
+	exit;
+    }
+
+
+    #
+    # Test that the plugin directory exists.
+    #
+    if ( ! -d $plugin_dir ) {
+	my $error = $literals->get( "PLUGIN_DIR_MISSING" );
+	print $error;
+	exit;
+    }
+
+
+    #
+    # Make sure the default theme exists.
+    #
+    if ( ! -d $theme_dir . "/" . $default_theme ) {
+	my $error = $literals->get( "DEFAULT_THEME_MISSING" );
+	print $error;
+	exit;
+    }
+
+    #
+    # Make sure we'll be able to send the correct Content-type: header.
+    #
+    if ( ! -e  $mime_file ) {
+	my $error = $literals->get( "MIME_MISSING" );
+	print $error;
+	exit;
+    }
+
+    #
+    #  If the logfile isn't writable we'll not be able to log anything.
+    #
+    if ( ( -e $access_log ) && ( ! -w $access_log ) ) {
+	my $error = $literals->get( "RO_ACCESS_LOG" );
+	print $error;
+	exit;
+    }
+
+    # Make sure the now playing directory is writable
+    if ( defined( $NOW_PLAYING_PATH ) && ( ! -w $NOW_PLAYING_PATH ) )
+    {
+	my $error = $literals->get( "RO_NOW_SERVING" );
+	print $error;
+	exit;
+    }
+
+
+    # The logfile doesn't exist, can we create it?
+    if ( $access_log =~ /(.*)\/(.*)/ )
+    {
+        my $dir = $1;
+
+	if ( ! -d $dir )
+	{
+	    print "The directory '$dir' which should create our logfile '$access_log'\n";
+	    print "doesn't exist.  Exitting.\n";
+	    exit;
+	}
+	if ( ! -w $dir )
+	{
+	    print "The directory '$dir' within which should create our logfile isn't writable by you.";
+	    print "Exitting.\n";
+	    exit;
+	}
+    }
+}
+
+
+
+
+#
+#  Return todays date and time; in a format suitable for
+# logging to our access log.
+#
+sub http_date ()
+{
+    my( $nday, $nmon, $day, $time, $year);
+    my $now = scalar(gmtime());
+    $now =~ s/  / /g;
+    ($nday, $nmon, $day, $time, $year) = split(/ /, $now);
+    $day = sprintf("%02d", $day);
+    return "$day\/$nmon\/$year:$time +0000";
+}
+
+
+
+
+
+=head2 END
+
+  This next block is special - it is called automagically by Perl when the
+ current process is dying.
+
+  Here we take the opertunity to log the current request, if we have one
+ setup (ie. if we're a child process).
+
+  We have to log at the point, because when the request is initiated we don't
+ know what HTTP access code we're going to send, nor do we know the size of
+ the transfer we're going to make.
+
+=cut
+
+END
+{
+    #
+    #  The client isn't connected now - so remove the track from
+    # the list of currently streaming songs.
+    #
+    if ( $REQUEST && $connected_address )
+    {
+	if ( -e $in_progress )
+	{
+	    unlink( $in_progress );
+	}
+    }
+
+    #
+    #  Only log if we sent back a HTTP header code.
+    #
+    #  This should mean that we are only called when we're the child.
+    #
+    if ( $HTTP_CODE ne 0 )
+    {
+	#
+	# Note the time/datestamp is that of the access _finishing_
+	# not starting.
+	#
+	our $date  = "";
+	$date      = http_date();
+
+	#
+	#  Lock the output logfile.
+	#
+	flock( LOGGER, 8 );
+
+	#
+	#  We have no logged in username.
+	#
+	our $user = "-";
+
+	#
+	#  The format string that we write the logfile into.
+	#
+	#  The default here is a valid Apache common format string.
+	#
+	my $format = &getConfig( "log_format",
+				'$connected_address - $user [$date] "GET $REQUEST" $HTTP_CODE $SERVED_SIZE "-" "$USER_AGENT"' );
+
+	#
+	#  Interpolate it, and write it out.
+	#
+	my $text = $literals->interpolateString( $format );
+	print LOGGER $text . "\n";
+
+
+	#
+	# unlock and close logfile.
+	flock( LOGGER, 8 );
+	close( LOGGER );
+    }
+
+    exit;
+}
+

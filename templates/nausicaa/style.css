@@ -1,0 +1,63 @@
+/* Body control */
+BODY  {
+	margin : 5px 5px;
+	background : #32537C;
+	color : #FFFFFF;
+	font-family: Verdana, "Times New Roman", Times, sans-serif;
+}
+
+/* Link control */
+A:Link {
+	background : transparent;
+	color : #C0FFFF;
+	text-decoration: none;
+} 
+
+A:Visited {
+	background : transparent;
+	color : #C0FFFF;
+	text-decoration: none;
+}
+
+A:Active {
+	background : transparent;
+	color : #FF0000;
+	text-decoration: none;
+}
+
+A:hover { 
+	background : #183868;
+	color : #FFFFFF;
+	text-decoration: none;
+}
+
+/* Header control */
+
+.header {
+	font-size : 145%;
+	font-weight : 600;
+	font-family: Arial, sans-serif;
+}
+
+/* Subtitle (subdirectories, songs, etc) control */
+
+.subtitle {
+	font-size : 155%;
+	letter-spacing : 2px;
+	font-family : Tahoma, Times, sans-serif;
+}
+
+/* Banner control */
+
+.banner { 
+	font-size : 80%; 
+	font-family: Georgia, serif; 
+	text-align : center;
+}
+
+/* Quick Links control */
+
+.qlinks	{
+	font-size : 70%;
+	font-family : Tahoma, Arial, serif;
+}	

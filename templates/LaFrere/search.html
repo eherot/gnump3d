@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html lang="en">
+  <head>
+$META
+    <style type="text/css">
+	body {font-family: arial, sans-serif; color: black; background-color: white;}
+	td.title {color: gray; font-weight:bold; height:30px}
+	table.dashed { border: 1px dashed }
+
+	:link { color : #808; }
+	:visited { color: #800; }
+	
+	a { text-decoration: none; }
+
+	a.top {color: #808; font-weight: bold; }
+      
+	a.dir:visited {color: #A0c0f0; font-weight: bold; }
+	a.dir:link {color: #A0c0; font-weight: bold; }
+
+	a.info {color: black; font-size: 10px;}
+	a.gnump3d {color: #939393; ; font-weight: bold;}
+
+	legend {font-weight: bold; }
+      </style>
+ <title>GNUMP3d [ $HOSTNAME : $DIRECTORY ]</title>    
+  </head>
+  <body onLoad="document.forms.searchform.q.focus();">
+  <table width="100%" border="0" cellpadding="0">
+    <tr>
+      <td valign="top" width="35px">
+        <a class="top" href="http://www.gnump3d.org"><img width="20" height="400" src="/logo.png" alt="logo" border="0"></a>
+      </td>
+      <td valign="top">
+        <form action="/search/" method="get">
+          <table class="dashed" width="100%" border="0" cellpadding="2">
+            <tr>
+              <td align="left" width="50%" valign="top">
+                <a class="gnump3d" href="http://www.gnump3d.org">GNUMP3d</a> server on $HOSTNAME<br>
+                <a class="info" href="http://www.gnump3d.org/FAQ.html" title="View this software's Frequently Asked Questions - with answers!">FAQ</a>
+                <br>
+                <strong>Music Search :</strong>
+                <input type="text" name="q">
+              </td>
+              <td valign="top">
+                <a class="top" href="/" title="Go to the root of the music archive.">Home</a>
+                <br>
+		<a class="top" href="/size" title="See the size of your archive">Archive Size</a>
+		<br>
+		<a class="top" href="/tagbrowse" title="Browse archive by genre">Browse by Genre</a>
+                <br>
+                <a class="top" href="/playlist/" title="Selectively stream different directories.">Custom Playlists</a>
+                <br>
+		<a class="top" href="/now/" title="See which tracks are currently playing">Currently Playing</a>
+              </td>
+              <td valign="top">
+                <a class="top" href="/stats/" title="See the most popular songs on this server.">Most Popular</a>
+                <br>
+                <a class="top" href="/recent/" title="See the most recent tracks played">Most Recent</a>
+                <br>
+                <a class="top" href="/search/" title="Search the archive for music">Search</a>
+                <br>
+		<a class="top" href="/random/" title="Listen To Random Music">Random Music</a>
+		<br>
+                <a class="top" href="/prefs/" title="Change your prefernces">Preferences</a>
+                <br>
+              </td>
+            </tr>
+          </table>
+        </form>
+
+    <form action="/search/" method="get">
+      <fieldset>
+	<legend align="left">
+	    Search Archive For Music
+	</legend>
+
+	<table border="0" cellpadding="2" cellspacing="0" width="100%">
+	  
+	  <tr>
+	    <td></td>
+	    <td></td>
+	  </tr>
+	  
+	  <tr>
+	    <td align="right">Search Terms : </td>
+	    <td align="left">
+                  <input type="text" name="q" size="40">
+                </td>
+	  </tr>
+	  <tr><td align="right">Search for:</td><td align="left">
+	   <input type="radio" name="type" value="all" checked> All Terms
+	    <input type="radio" name="type" value="any"> Any Terms
+	    </td></tr>
+	  <tr>
+	    <td></td>
+	    <td></td>
+	  </tr>
+
+	  <tr><td align="right">Search artist:</td><td align="left"><input type="text" name="artist" size="40" /></td></tr>
+	  <tr>
+	    <td></td>
+	    <td></td>
+	  </tr>
+
+<tr><td align="right">Search album:</td><td align="left"><input type="text" name="album" size="40" /></td></tr>
+          <tr>
+	    <td></td>
+	    <td></td>
+	  </tr>
+
+<tr><td align="right">Search song:</td><td align="left"><input type="text" name="title" size="40" /></td></tr>
+          <tr>
+	    <td></td>
+	    <td></td>
+	  </tr>
+
+<tr><td align="right">Search year:</td><td align="left"><input type="text" name="year" size="40" /></td></tr>
+          <tr>
+	    <td></td>
+	    <td></td>
+	  </tr>
+
+	  <tr>
+	    <td align="right">Start Directory : </td>
+	    <td align="left">$SELECT_COMBO</td>
+	  </tr>
+	  
+	  <tr>
+	    <td></td>
+	    <td></td>
+	  </tr>
+
+	  <tr>
+	    <td align="right">Genres:</td>
+	    <td align="left">$GENRE_COMBO</td>
+	  </tr>
+	  
+	  <tr>
+	    <td></td>
+	    <td></td>
+	  </tr>
+
+	  <tr>
+	  <td align="right">Play Results:</td><td align="left">
+	    <input type="radio" name="play" value="0" checked> No
+	    <input type="radio" name="play" value="1"> Yes
+	  </td>
+	  </tr>
+	  
+	  <tr>
+	    <td></td>
+	    <td></td>
+	  </tr>
+	  
+	  <tr>
+	    <td></td>
+	    <td>
+                  <input type="submit">
+                </td>
+	  </tr>
+	  
+	  <tr>
+	    <td></td>
+	    <td></td>
+	  </tr>
+	</table>
+      </fieldset>
+    </form>
+    
+  </td>
+    </tr>
+  </table>
+ </body>
+</html>
+<!--
+Local Variables: ***
+mode: html ***
+End: ***
+-->

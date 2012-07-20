@@ -1,0 +1,36 @@
+<!-- include="header.tmpl" -->
+
+<table class="items">
+<tr><td class="item-head">$HOSTNAME</td></tr>
+<tr><td><p>$BANNER</p></td></tr>
+</table>
+
+<PLAYLISTS>
+<table class="items">
+<tr><td class="item-head" colspan="4">Playlists</td></tr>
+$PLAYLISTS
+</table>
+</PLAYLISTS>
+
+<DIRS>
+<table class="items">
+<tr><td class="item-head" colspan="4">Subdirectories of $DIRECTORY</td></tr>
+$DIRECTORIES
+</table>
+</DIRS>
+
+<FILES>
+<table class="items">
+<tr><td class="item-head" colspan="2">Songs</td></tr>
+$SONGS
+</table>
+</FILES>
+
+<MOVIES>
+<table class="items">
+<tr><td class="item-head" colspan="2">Movies</td></tr>
+$MOVIES
+</table>
+</MOVIES>
+
+<!-- include="footer.tmpl" -->

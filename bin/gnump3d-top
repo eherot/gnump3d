@@ -1,0 +1,865 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+  gnump3d-top - Display entries from an Apache common log file.
+
+=head1 SYNOPSIS
+
+  gnump3d-top [global options] [display options]
+
+  Help Options:
+    --manual           Show the manual.
+    --help             Show this help.
+    --version          Show the version number.
+
+  Global Options:
+    --config=file      Set the GNUMP3d config file.
+    --count=N          Set the number of entries to show.
+    --debug            Show debugging output.
+    --plain            Show output as plain text
+
+  Display Options:
+    --agents           Show the top N user agents.
+    --dirs             Show the top N directories.
+    --hide             Hide the default directories.
+    --last             Show the last N songs played.
+    --logfiles pattern Set the logfile pattern, for reading multiple logfiles.
+    --songs            Show the top N songs.
+    --users            Show the top N users.
+
+=cut
+
+
+=head1 DESCRIPTION
+
+  This script will allow you to process the logfiles which are created
+ when clients connect to the GNUMP3d server, and show you statistics 
+ such as the most popular song(s), directories, and users.
+
+=cut
+
+
+=head1 OPTIONS
+
+=cut
+
+
+=head1 AUTHOR
+
+
+ Steve
+ --
+ http://www.steve.org.uk/
+
+ $Id: gnump3d-top,v 1.14 2006/09/10 20:58:59 skx Exp $
+
+=cut
+
+
+=head1 LICENSE
+
+Copyright (c) 2005 by Steve Kemp.  All rights reserved.
+
+This module is free software;
+you can redistribute it and/or modify it under
+the same terms as Perl itself.
+The LICENSE file contains the full text of the license.
+
+=cut
+
+
+#
+# Standard Perl modules.
+#
+use Env;
+use Getopt::Long;
+use Pod::Usage;
+use strict;
+
+#
+#  Our modules.
+#
+use gnump3d::files;
+use gnump3d::filetypes;
+
+
+
+#
+###
+#
+#  Neat Hack - close STDERR and make all writes to it go to STDOUT,
+# this way gnump3d will receive all errors if something goes wrong
+# in the script execution.
+#
+###
+#
+select STDOUT;
+$| = 1;
+open (STDERR,">&STDOUT");
+
+
+#
+# Version identifier for this script.
+#
+my $VERSION_NUMBER = '$Revision: 1.14 $';
+
+
+#
+#  Options set by the command line arguments.
+#
+my %CONFIG;
+
+#
+#  File-type tester.
+#
+my $tester = gnump3d::filetypes->new();
+
+
+$CONFIG{'count'} = 20;   # Default number of entries to show.
+
+
+#
+#  First use the users personal configuration file.
+#
+if ( ( $ENV{"HOME"} ) && ( -e $ENV{"HOME"} . "/.gnump3drc" ) )
+{
+    $CONFIG{'file'} = $ENV{"HOME"} . "/.gnump3drc";
+}
+elsif ( -e "/etc/gnump3d/gnump3d.conf" )
+{
+    #
+    # Otherwise the system wide one.
+    #
+    $CONFIG{'file'} = "/etc/gnump3d/gnump3d.conf";
+}
+elsif ( -e "gnump3d.conf" )
+{
+    # Finally one in the current directory.
+    # (This is mainly here for Windows users).
+    $CONFIG{'file'} = "gnump3d.conf";
+}
+
+
+
+
+
+#
+#  These are directories which are handled by plugins, and shouldn't
+# be included in the main statistics.
+#
+my %DEFAULT_DIRS = ( "/"          => 1,
+		     "/stats/"    => 1,
+		     "/prefs/"    => 1,
+		     "/recent/"   => 1,
+		     "/load/"     => 1,
+		     "/search/"   => 1,
+		     "/bug/"      => 1,
+		     "/COPYING/"  => 1,
+		     "/playlist/" => 1,
+		     "/now/"	  => 1
+		   );
+			 
+			
+
+#  Parse the options.
+parseArguments();
+
+
+#  Start the script proper.
+main();
+
+#  Finished.
+exit;
+
+
+
+
+#
+#  Call routines to do our work, depending on the state of
+# the options that we've been given.
+#
+sub main
+{
+    if ( $CONFIG{'SHOW_SONGS'} )
+    {
+	showTopSongs( $CONFIG{'count'} );
+    }
+    elsif ( $CONFIG{'SHOW_LAST'} )
+    {
+	showLastSongs( $CONFIG{'count'} );
+    }
+    elsif ( $CONFIG{'SHOW_DIRS'} )
+    {
+	showTopDirs( $CONFIG{'count'} );
+    }
+    elsif ( $CONFIG{'SHOW_USERS'} )
+    {
+	showTopUsers( $CONFIG{'count'} );
+    }
+    elsif ( $CONFIG{'SHOW_LOGINS'} )
+    {
+	showTopLogins( $CONFIG{'count'} );
+    }
+    elsif ( $CONFIG{'SHOW_AGENTS'} )
+    {
+	showTopAgents( $CONFIG{'count'} );
+    }
+    else
+    {
+	pod2usage(1);
+    }
+}
+
+
+#
+# Show the top N user agents.
+#
+sub showTopAgents
+{
+    my ( $count ) = (@_);
+    my %AGENTS;
+
+    my @lines = getLogfile();
+    foreach my $line ( @lines )
+    {
+	if ( $line =~ / \"([^\"]+)\"$/ )
+	{
+	    my $entry = $1;
+	    $AGENTS{ $entry } ++;
+	}
+    }
+    
+    if ( $CONFIG{'show_plain'} )
+    {
+	print "Count\t\t\tUser-Agent\n";
+    }
+    else
+    {
+	print "<tr><td><b>Count</b></td><td><b>User-Agent</b></td></tr>\n";
+    }
+
+
+    my $open = "";
+    my $mid  = "\t\t";
+    my $close = "";
+
+    if ( ! $CONFIG{'show_plain'} )
+    {
+	$open = "<tr><td>";
+	$mid  = "</td><td>";
+	$close = "</td></tr>";
+    }
+
+    foreach my $song (sort { $AGENTS{$b} <=> $AGENTS{$a} }
+		            keys %AGENTS)
+    {
+	$count -= 1;
+
+	if ( $CONFIG{'show_plain'} )
+	{
+	    print $open . $AGENTS{$song} . $mid . $song . $close . "\n";
+	}
+	else
+	{
+	    print $open .  $AGENTS{$song} . $mid . $song . $close . "\n";
+	}
+
+	return if $ count le 0;
+    }
+}
+
+
+#
+#  Show the top N songs, along with links to them.
+#
+#  Note that we take acount of the 'always_stream' setting from the
+# configuration file here..
+#
+sub showTopSongs
+{
+    my ( $count ) = (@_);
+    my %SONGS;
+
+    my @lines = getLogfile();
+    foreach my $line ( @lines )
+    {
+	#
+	# We should only receive GET's anyway .. can't hurt to be
+	# paranoid.
+	#
+	if ( $line =~ /\"GET ([^\"]+)\"/ )
+	{
+	    my $entry = $1;
+	    if (  $entry =~ /\/$/ )
+	    {
+                $CONFIG{'debug'} && print "Ignoring directory : $entry\n";
+	    }
+	    elsif ( $entry =~ /^\/search\?[pq]=/ )
+	    {
+		$CONFIG{'debug'} && print "Ignoring search request: $entry\n";
+	    }
+	    else
+	    {
+		if ( $tester->isAudio( $entry ) )
+		{
+		    #  Here we're avoiding non-audio files - this might
+		    # happen if we allow people to serve files from the
+		    # theme directories.
+		    #
+		    $entry = prettifyEntry( $entry );
+		    
+		    $SONGS{ $entry } ++;
+		}
+		else
+		{
+		    $CONFIG{'debug'} && print "Ignored non-audio file : $entry\n";
+		}
+	    }
+	}
+    }
+
+    if ( $CONFIG{'show_plain'} )
+    {
+	print "Count\t\t\tSong\n";
+    }
+    else
+    {
+	print "<tr><td><b>Count</b></td><td><b>Song</b></td></tr>\n";
+    }
+
+
+    my $open = "";
+    my $mid  = "\t\t";
+    my $close = "";
+
+    if ( ! $CONFIG{'show_plain'} )
+    {
+	$open = "<tr><td>";
+	$mid  = "</td><td>";
+	$close = "</td></tr>";
+    }
+
+    #
+    # Handle the always_stream setting.
+    #
+    my $alwaysStream = alwaysStream();
+    if ( $alwaysStream )
+    {
+	$alwaysStream = ".m3u";
+    }
+    else
+    {
+	$alwaysStream = "";
+    }
+
+    foreach my $song (sort { $SONGS{$b} <=> $SONGS{$a} }
+		            keys %SONGS)
+    {
+	$count -= 1;
+
+	if ( $CONFIG{'show_plain'}  )
+	{
+	    print $open . $SONGS{$song} . $mid . $song . $close . "\n";
+	}
+	else
+	{
+	    print $open .  $SONGS{$song} . $mid .
+		"<a href=\"" . $song . $alwaysStream . "\">$song</a>" .
+	        $close . "\n";
+	}
+
+	return if $ count le 0;
+    }
+}
+
+
+
+
+#
+#  Show the last N songs, along with links to them.
+#
+#  Note that we take acount of the 'always_stream' setting from the
+# configuration file here..
+#
+sub showLastSongs
+{
+    my ( $count ) = (@_);
+    my %SONGS;
+
+    my @lines   = getLogfile();
+    my @last    = ();
+    foreach my $line ( @lines )
+    {
+	#
+	# We should only receive GET's anyway .. can't hurt to be
+	# paranoid.
+	#
+	if ( $line =~ /([^ ]+) (.*) \[([^\]]+)\] \"GET ([^\"]+)\"/ )
+	{
+	    my $ip    = $1;
+	    my $time  = $3;
+	    my $entry = $4;
+
+	    $CONFIG{'debug'} && print "IP is $ip, Time is $time, Entry is $entry\n";
+
+	    if ( $time =~ /(.*)\+(.*)/ ) { $time = $1 };
+
+	    $CONFIG{'debug'} && print "time is $time - minus timezone offest\n";
+
+	    if (  $entry =~ /\/$/ )
+	    {
+                $CONFIG{'debug'} && print "Ignoring directory : $entry\n";
+	    }
+	    elsif ( $entry =~ /^\/search\?[pq]=/ )
+	    {
+		$CONFIG{'debug'} && print "Ignoring search request: $entry\n";
+	    }
+	    elsif ( $entry =~ /^\/info/ )
+	    {
+		$CONFIG{'debug'} && print "Ignoring information request: $entry\n";
+	    }
+	    else
+	    {
+		if ( $tester->isAudio( $entry ) )
+		{
+		    $entry = prettifyEntry( $entry );
+
+		    push @last, "$ip|$time|$entry";
+		} 
+		else
+		{
+		    $CONFIG{'debug'} && print "Ignored non-audio file $entry\n";
+		}
+	    }
+	}
+    }
+
+    if ( $CONFIG{'show_plain'} )
+    {
+	print "Host\t\tTime\t\tSong\n";
+    }
+    else
+    {
+	print "<tr><td><b>Host</b></td><td><b>Time</b></td><td><b>Song</b></td></tr>\n";
+    }
+
+
+    #
+    # Handle the always_stream setting.
+    #
+    my $alwaysStream = alwaysStream();
+    if ( $alwaysStream )
+    {
+	$alwaysStream = ".m3u";
+    }
+    else
+    {
+	$alwaysStream = "";
+    }
+
+    my $i = 0;
+    @last =  reverse( @last );
+    while ( ( $i < $count ) and
+	    ( defined( $last[ $i ] ) ) )
+    {
+	my ( $host, $time, $song );
+	if ($last[ $i ] =~ /([^|]+)\|([^|]+)\|([^|]+)/ )
+	{
+	    $host = IP2Hostname($1);
+	    $time = $2;
+	    $song = $3;
+	}
+
+	if ( $CONFIG{'show_plain'} )
+	{
+	    print $host . "\t\t" . $time . "\t\t" . $song . "\n";	
+	}
+	else
+	{
+	    print "<tr><td>$host</td><td>$time</td><td><a href=\"" . 
+	        $song . $alwaysStream .  "\">" . $song. "</a></td></tr>\n";
+	}
+
+	$i++;
+    }
+}
+
+
+#
+#  Show the most popular directories.
+#
+sub showTopDirs
+{
+    my ( $count ) = (@_);
+    my %SONGS;
+
+    my @lines = getLogfile();
+    foreach my $line ( @lines )
+    {
+	if ( $line =~ /\"GET ([^\"]+)\"/ )
+	{
+	    my $entry = $1;
+	    if ( $entry =~ /\/$/ )
+	    {
+		$CONFIG{'debug'} && print "Found dir $entry\n";
+		$entry = prettifyEntry( $entry );
+		$SONGS{ $entry } ++;
+	    }
+	}
+    }
+
+    if ( $CONFIG{'show_plain'} )
+    {
+	print "Count\t\t\tDirectory\n";
+    }
+    else
+    {
+	print "<tr><td><b>Count</b></td><td><b>Directory</b></td></tr>\n";
+    }
+
+
+    my $open = "";
+    my $mid  = "\t\t";
+    my $close = "";
+
+    if ( ! $CONFIG{'show_plain'} )
+    {
+	$open = "<tr><td>";
+	$mid  = "</td><td>";
+	$close = "</td></tr>";
+    }
+
+    foreach my $song (sort { $SONGS{$b} <=> $SONGS{$a} }
+		            keys %SONGS)
+    {
+	
+	next if ( ( $CONFIG{'hide_default'} ) &&
+		  ( defined( $DEFAULT_DIRS{ $song } ) ) );
+
+	$count -= 1;
+	if ( $CONFIG{'show_plain'}  )
+	{
+	    print $open . $SONGS{$song} . $mid . $song . $close . "\n";
+	}
+	else
+	{
+	    print $open .  $SONGS{$song} . $mid .
+		"<a href=\"" . $song . "\">$song</a>" . $close . "\n";
+	}
+
+	return if $ count le 0;
+    }
+}
+
+
+#
+#  Show the names/ip's of the N clients which have made the most
+# requests from us
+#
+sub showTopUsers
+{
+    my ( $count ) = (@_);
+    my %USERS;
+
+    my @lines = getLogfile();
+    foreach my $line ( @lines )
+    {
+	if ( $line =~ /([^ ]+) -/ )
+	{
+	    my $entry = $1;
+            $CONFIG{'debug'} && print "Found user $entry\n";
+	    $USERS{ $entry } ++;
+	}
+    }
+
+    if ( $CONFIG{'show_plain'} )
+    {
+	print "IP Address (Hostname)\t\t\tConnection Count\n";
+    }
+    else
+    {
+	print "<tr><td><b>IP Address</b> (<b>Hostname</b>)</td>";
+	print "<td><b>Connection Count</b></td></tr>\n";
+    }
+
+
+    my $open = "";
+    my $mid  = "\t\t";
+    my $close = "";
+
+    if ( ! $CONFIG{'show_plain'} )
+    {
+	$open = "<tr><td>";
+	$mid  = "</td><td>";
+	$close = "</td></tr>";
+    }
+
+    foreach my $song (sort { $USERS{$b} <=> $USERS{$a} }
+		            keys %USERS)
+    {
+	#
+	#  Only get the hostnames for the clients that we're going
+	# to display.
+	#
+	my $host = IP2Hostname( $song );
+
+	$count -= 1;
+	print $open . $song . " (" . $host . ")" . $mid . $USERS{$song} . $close . "\n";
+	return if $ count le 0;
+    }
+}
+
+
+
+#
+#  Show the names of the N logged in clients which have made the most
+# requests from us
+#
+sub showTopLogins
+{
+    my ( $count ) = (@_);
+    my %LOGINS;
+
+    my @lines = getLogfile();
+    foreach my $line ( @lines )
+    {
+	if ( $line =~ /([^ ]+) - (.*) \[/ )
+	{
+	    my $username = $2;
+	    if ( $username ne "-" )
+	    {
+		$LOGINS{ $username } ++;
+	    }
+	}
+    }
+
+    if ( $CONFIG{'show_plain'} )
+    {
+	print "Login Name\t\t\tConnection Count\n";
+    }
+    else
+    {
+	print "<tr><td><b>Login Name</b></td>";
+	print "<td><b>Connection Count</b></td></tr>\n";
+    }
+
+
+    my $open = "";
+    my $mid  = "\t\t";
+    my $close = "";
+
+    if ( ! $CONFIG{'show_plain'} )
+    {
+	$open = "<tr><td>";
+	$mid  = "</td><td>";
+	$close = "</td></tr>";
+    }
+
+    foreach my $song (sort { $LOGINS{$b} <=> $LOGINS{$a} }
+		            keys %LOGINS )
+    {
+	print $open . $song .  $mid . $LOGINS{$song} . $close . "\n";
+	return if $ count le 0;
+    }
+}
+
+
+#
+#  Is 'always_stream' enabled in the configuration file?
+#
+sub alwaysStream
+{
+    open( CONFIG, "<" . $CONFIG{'file'}  )
+      or die "Cannot open configuration file $CONFIG{'file'} : $!";
+
+    my @config = <CONFIG>;
+    close( CONFIG );
+
+
+    my $alwaysStream = 0;
+    
+    foreach my $line ( @config )
+    {
+	next if $line =~ /^\s*#/ ;
+	
+	if ( $line =~ /always_stream\s*=\s*(\S*)/ )
+	{
+	    $alwaysStream = $1;
+	}
+    }
+    
+    return( $alwaysStream );
+}
+
+
+
+#
+#  Return the text of our logfile - this routine takes care of handling
+# multiple files, and uncompressing any gzipped files.
+#
+sub getLogfile()
+{
+
+    open( CONFIG, "<" . $CONFIG{'file'} )
+      or die "Cannot open configuration file $CONFIG{'file'} : $!";
+
+    my @config = <CONFIG>;
+    close( CONFIG );
+
+
+    my $logFile = undef;
+
+    foreach my $line ( @config )
+    {
+	next if $line =~ /^\s*#/ ;
+
+	if ( $line =~ /logfile\s*=\s*(\S*)/ )
+	{
+	    #
+	    # We're only going to care about the first
+	    # logfile line we find.
+	    #
+	    if ( ! defined( $logFile ) )
+	    {
+		$logFile = $1;
+	    }
+	}
+    }
+
+    die "Can't find logfile entry in config file" unless defined $logFile;
+
+    open( LOGS, "<" . $logFile ) or die "Cannot open logfile $logFile : $!";
+    my @logs = <LOGS>;
+    close( LOGS );
+
+    #
+    # Now we can add in any additional logfiles we might have been
+    # given.
+    #
+    if (defined ( $CONFIG{'logfile_pattern'} ) )
+    {
+	foreach my $file ( glob( $CONFIG{'logfile_pattern'} ) )
+	{
+	    # Is the logfile gzipped?
+	    if ( $file =~ /gz$/ )
+	    {
+		# TODO: Will fail if there is no zcat installed.
+		open( LOGS, "zcat $file|" )
+		  or die "Cannot read piped logfile - $file : $! ";
+	    }
+	    else
+	    {
+		# Open file normally.
+		open( LOGS, "<" . $file )
+		  or die "Cannot open logfile - $file : $!";
+	    }
+	    
+	    my @entries = <LOGS>;
+	    push(@logs, @entries);
+	    close( LOGS );
+	}
+    }
+    
+    return( @logs );
+}
+
+
+#
+#  Parse the command line options.
+#
+sub parseArguments
+{
+    my $HELP	= 0;
+    my $MANUAL	= 0;
+    my $VERSION	= 0;
+
+    #  Parse options.
+    #
+    GetOptions(
+	       #
+	       # Help options.
+	       #
+               "help",       \$HELP,
+               "version",    \$VERSION,
+	       "manual",     \$MANUAL,
+	       "debug",      \$CONFIG{'debug'},
+
+	       #
+	       # Global options.
+	       #
+	       "count=s",    \$CONFIG{'count'},
+	       "config=s",   \$CONFIG{'file'},
+	       "logfiles=s", \$CONFIG{'logfile_pattern'},
+	       "plain",      \$CONFIG{'show_plain'},
+	       "hide",       \$CONFIG{'hide_default'},
+
+	       #
+	       # Types of output.
+	       #
+	       "songs",      \$CONFIG{'SHOW_SONGS'},
+	       "last",       \$CONFIG{'SHOW_LAST'},
+	       "dirs",       \$CONFIG{'SHOW_DIRS'},
+	       "users",      \$CONFIG{'SHOW_USERS'},
+	       "logins",     \$CONFIG{'SHOW_LOGINS'},
+	       "agents",     \$CONFIG{'SHOW_AGENTS'},
+	       );
+   
+    pod2usage(1) if $HELP;
+    pod2usage(-verbose => 2 ) if $MANUAL;
+
+
+    if ( $VERSION )
+    {
+	my $REVISION      = '$Revision: 1.14 $';
+
+	if ( $REVISION =~ /1.([0-9.]+) / )
+	{
+	    $REVISION = $1;
+	}
+
+	print "gnump3d-top $REVISION\n";
+	exit;
+
+    }
+}
+
+
+=head2 prettifyEntry
+
+Normalize a given path, removing duplication "/"'s.
+
+=cut
+
+sub prettifyEntry
+{
+    my ( $string ) = (@_);
+
+    # Remove duplicate '/' characters.
+    while ( $string =~ /(.*)\/\/(.*)/ )
+    {
+	$string = $1 . "/" . $2;
+    }
+
+    # URL decode.
+    $string  =~ tr/+/ /;
+    $string  =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+
+    return( $string );
+}
+
+
+
+=head2 IP2Hostname
+
+  Convert an IP address to a Hostname and return it.
+
+=cut
+
+sub IP2Hostname
+{
+    my( $ip ) = ( @_ );
+
+    my @address = gethostbyaddr( pack( 'C4', split(/\./, $ip)), 2 );
+    return(  @address > 0 ? $address[0] : $ip );
+}

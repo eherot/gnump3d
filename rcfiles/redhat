@@ -1,0 +1,45 @@
+#!/bin/sh
+#
+# mp3d:        This is an init script for RedHat distribution.
+#
+# Author:      Colin Tinker <g1gsw@g1gsw.org>
+#
+# chkconfig: 345 99 9
+# description: gnump3d is a streaming mp3 daemon with a built in webserver.
+# config: /etc/gnump3d/gnump3d.conf
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+[ -f /usr/bin/gnump3d ] || exit 0
+[ -f /etc/gnump3d/gnump3d.conf ] || exit 0
+
+PATH=/sbin:/bin:$PATH
+
+# See how we were called.
+case "$1" in
+  start)
+	echo -n "Starting gnump3 daemon: "
+	daemon /usr/bin/gnump3d --background
+	echo
+	touch /var/lock/subsys/gnump3d
+	;;
+  stop)
+	echo -n "Shutting down gnump3 daemon: "
+	killproc gnump3d
+	echo
+	rm -f /var/lock/subsys/gnump3d
+	;;
+  status)
+	status gnump3d
+	;;
+  restart)
+	$0 stop
+	$0 start
+	;;
+  *)
+	echo "Usage: mp3d {start|stop|status|restart}"
+	exit 1
+esac
+
+exit 0
+

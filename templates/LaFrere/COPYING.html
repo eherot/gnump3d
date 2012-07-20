@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html lang="en">
+  <head>
+$META
+    $HEADER
+    <style type="text/css">
+	body {font-family: arial, sans-serif; color: black; background-color: white;}
+	td.title {color: gray; font-weight:bold; height:30px}
+	table.dashed { border: 1px dashed }
+
+	:link { color : #808; }
+	:visited { color: #800; }
+	
+	a { text-decoration: none; }
+
+	a.top {color: #808; font-weight: bold; }
+      
+	a.dir:visited {color: #A0c0f0; font-weight: bold; }
+	a.dir:link {color: #A0c0; font-weight: bold; }
+
+	a.info {color: black; font-size: 10px;}
+	a.gnump3d {color: #939393; ; font-weight: bold;}
+
+	legend {font-weight: bold; }
+      </style>
+    <title>GNUMP3d [ $HOSTNAME : $DIRECTORY ]</title>
+  </head>
+ <body>
+
+  <table width="100%" border="0" cellpadding="0">
+    <tr>
+      <td valign="top" width="35px">
+        <a class="top" href="http://www.gnump3d.org"><img width="20" height="400" src="/logo.png" alt="logo" border="0"></a>
+      </td>
+      <td valign="top">
+        <form action="/search" method="get">
+          <table class="dashed" width="100%" border="0" cellpadding="2">
+            <tr>
+              <td align="left" width="50%" valign="top">
+                <a class="gnump3d" href="http://www.gnump3d.org">GNUMP3d</a> server on $HOSTNAME<br>
+                <a class="info" href="http://www.gnump3d.org/FAQ.html" title="View this software's Frequently Asked Questions - with answers!">FAQ</a>
+                <br>
+                <strong>Music Search :</strong>
+                <input type="text" name="q">
+              </td>
+              <td valign="top">
+                <a class="top" href="/" title="Go to the root of the music archive.">Home</a>
+                <br>
+		<a class="top" href="/size" title="See the size of your archive">Archive Size</a>
+		<br>
+		<a class="top" href="/tagbrowse" title="Browse archive by genre">Browse by Genre</a>
+                <br>
+                <a class="top" href="/playlist/" title="Selectively stream different directories.">Custom Playlists</a>
+                <br>
+		<a class="top" href="/now/" title="See which tracks are currently playing">Currently Playing</a>
+              </td>
+              <td valign="top">
+                <a class="top" href="/stats/" title="See the most popular songs on this server.">Most Popular</a>
+                <br>
+                <a class="top" href="/recent/" title="See the most recent tracks played">Most Recent</a>
+                <br>
+                <a class="top" href="/search/" title="Search the archive for music">Search</a>
+                <br>
+		<a class="top" href="/random/" title="Listen To Random Music">Random Music</a>
+		<br>
+                <a class="top" href="/prefs/" title="Change your prefernces">Preferences</a>
+                <br>
+              </td>
+            </tr>
+          </table>
+        </form>
+        <p class="dashed">
+	    $BANNER
+	  </p>
+
+    <fieldset>
+      <legend align="left">
+	$HEADING
+      </legend>
+
+      <table border="0" cellpadding="2" cellspacing="0" width="100%">	
+	<tr>
+	  <td>
+	    $TEXT
+	  </td>
+	</tr>
+      </table>
+    </fieldset>
+    
+  </td>
+    </tr>
+  </table>
+ </bodY>
+</html>
+<!--
+Local Variables: ***
+mode: html ***
+End: ***
+-->

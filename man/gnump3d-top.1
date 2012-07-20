@@ -1,0 +1,48 @@
+\" Process this file with
+.\" groff -man -Tascii foo.1
+.\"
+.TH gnump3d-top 1 "March 2002" Linux "User Manuals"
+.SH NAME
+gnump3d-top \- view usage statistics from gnump3d
+.SH SYNOPSIS
+.B gnump3d-top [--options]
+.B ...
+.SH DESCRIPTION
+.B gnump3d-top
+allows you to view the most popular songs, directories,
+and most active users - as recorded by 
+.BR gnump3d (1)
+
+.SH OPTIONS
+.IP --debug
+Show debugging output.
+.IP --users
+Show the top N users.
+.IP --dirs
+Show the top N directories.
+.IP --hide
+Hide all the directories which are handled by supplied plugins
+.IP --files
+Show the top N files
+.IP --last
+Show the last N songs served.
+.IP --search
+Show the top N search requests.
+.IP --agents
+Show the top N user agents which we have served.
+.IP --count=N
+Set the number of values to display, defaults to 20.
+
+.SH FILES
+.I gnump3d.conf
+.RS
+The system wide configuration file. See
+.BR gnump3d.conf (1)
+for further details.
+
+.SH AUTHOR Steve Kemp <steve@steve.org.uk>
+
+.SH "SEE ALSO"
+.BR gnump3d (1),
+.BR gnump3d.conf (1)
+

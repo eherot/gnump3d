@@ -1,0 +1,39 @@
+
+
+GNUMP3d on Mac OS X
+-------------------
+
+  Installation of this software should be a simple matter of following
+ the instructions given in the README file.
+
+  The only major difference should be in making the server start when
+ your machine is booted.
+
+  The following instructions were contributed Eric Lawrence, (his email
+ address in the AUTHORS file if you wish to mail him directly).
+
+
+Starting GNUMP3d
+----------------
+
+  To set up gnump3d as a StartupItem in OS X, first create    
+ /Library/StartupItems as root (if it doesn't already exist):
+
+  sudo mkdir -p /Library/StartupItems
+
+  Change to /Library/StartupItems, and unpack the tarball which you can
+ find in the 'rcfiles' directory of the GNUMP3d distribution:
+
+  cd /Library/StartupItems
+  sudo tar xzf /path/to/gnump3d-source/rcfiles/gnump3d-MacOSX-StartupItem.tar.gz
+
+  To test it, either reboot or run
+
+  sudo SystemStarter start gnump3d
+
+
+
+Steve
+---
+www.gnump3d.org
+

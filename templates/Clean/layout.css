@@ -1,0 +1,169 @@
+.alignCenter { text-align: center; }
+.alignLeft   { text-align: left;   }
+.alignRight  { text-align: right;  }
+
+body 
+	{
+	margin: 1em 1em 0em 1em;
+	font-family: sans-serif;
+	font-size: 101%;
+	background-color: #FFD39B;
+	color: black;
+	}
+	
+.heavy
+	{
+	font-weight: bolder;
+	}
+
+.boxfooter
+	{
+	/*
+	background: #006400;
+	color: #fff;
+	*/
+	border: solid 1px black;
+	clear: both;
+	font-size: 90%;
+	text-align: center;
+	}
+
+.boxLeft
+	{
+	/*
+	background-color: #dcdcdc;
+	color: #000;
+	*/
+	border: 1px solid black;
+	border-top: 0;
+	float: left;
+	width: 12em;
+	}
+
+.boxLeft p
+	{
+	font-size: 90%;
+	}
+	
+.boxLeft p:first-letter
+	{
+	padding-left: 1em;
+	}
+	
+.boxLeftTop
+	{
+	width: 100%;
+	text-align: center;
+	background-color: #467CC2;
+	color: white;
+	padding-top: .2em;
+	padding-bottom: .2em;
+	}
+	
+.boxTop
+	{
+	border: 1px solid black;
+	text-align: center
+	}
+
+.boxValid
+	{
+	margin-top: .5em;
+	margin-bottom: .5em;
+	}
+	
+.boxValid img
+	{
+	margin: 0; 
+	padding: 0; 
+	border: 0;
+	}
+
+.colorRed { color: red; }
+
+h1, h2, h3 
+	{
+	margin: 0;
+	padding: 0.5em 0%;
+	background-color: transparent;
+	}
+	
+h1 	{ font-size: 160%; color: red; }
+h2	{ font-size: 140%; color: blue; }
+h3	{ font-size: 120%; color: green; }
+
+ul {
+ list-style-type: none;
+}
+	
+.imgleft  { float: left;  margin-right: .5em;}
+.imgright { float: right; margin-left : .5em;}
+.imgright, .imgleft 
+	{
+	font-size: 90%;
+	font-style: italic;
+	padding: .5em;
+	position: relative;
+	text-align: center;
+	}
+	
+#main 
+	{
+	margin-left: 12em;
+	padding: 2em;
+	}
+
+#main p   
+	{ 
+	/*text-align: justify;*/
+	text-indent: 1em;
+	line-height: 140%;
+	}
+
+//#main p:first-letter
+//	{
+//	font-size: 200%;
+//	}
+	
+.menu 
+	{
+	margin: auto;
+	}
+
+.menu a
+	{
+	/*
+	color: white;
+	background-color: transparent;
+	*/
+	text-align: center;
+	margin: .1em .3em .1em .3em;
+	padding: .2em .5em .2em .5em;
+	text-decoration: none;
+	}
+
+.menu a:focus
+	{
+	text-decoration: underline overline;
+	}
+
+.menu a:hover
+	{
+	text-decoration: underline overline;
+	}
+
+p,pre 
+	{
+	margin: 0px .5em .5em .5em;
+	}
+
+.smallText
+	{
+	font-size: 90%;
+	}
+
+.spacer    { margin: 1em; }
+
+.topMargin { margin-top: 1em; }
+
+.underOver { text-decoration: underline overline; }

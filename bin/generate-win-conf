@@ -1,0 +1,140 @@
+#!/usr/bin/perl -w
+#
+#  generate-win-conf - Generate gnump3d.conf.win from the master gnump3d.conf
+#                      This allows all comments to be kept in sync between the
+#                      two versions without effort.
+#
+#  GNU MP3D - A portable(ish) MP3 server.
+#
+# Homepage:
+#   http://www.gnump3d.org/
+#
+# Author:
+#  Steve Kemp <steve@steve.org.uk>
+#
+# Version:
+#  $Id: generate-win-conf,v 1.2 2005/08/18 22:48:05 skx Exp $
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#
+#  Steve Kemp
+#  ---
+#  http://www.steve.org.uk/
+#
+#
+
+
+#
+#  The directory containing the files we work with.
+#
+my $dir = shift;
+die "No directory specified " if not defined( $dir );
+
+
+#
+# The files we process
+#
+my $conf = $dir . "gnump3d.conf";
+my $win  = $dir . "gnump3d.conf.win.in";
+my $out  = $dir . "gnump3d.conf.win";
+
+#
+#  Read in the special values changing for windows.
+#
+my %KEYS;
+open( WIN, "<$win" ) or die "Cannot read windows special keys: $!";
+my @LINES = <WIN>;
+close( WIN );
+
+foreach my $line ( @LINES )
+{
+    chomp( $line );
+
+    # Skip lines beginning with comments
+    next if ( $line =~ /^([ \t]*)\#/ );
+
+    # Find variable settings
+    if ( $line =~ /([^=]+)=([^\n]+)/ )
+    {
+	my $key = $1;
+	my $val = $2;
+
+	# Strip leading and trailing whitespace.
+	$key =~ s/^\s+//;
+	$key =~ s/\s+$//;
+	$val =~ s/^\s+//;
+	$val =~ s/\s+$//;
+	
+	# Store value.
+	$KEYS{ $key } = $val;
+    }
+}
+
+
+#
+#  Now read in our input file, and build up the text to write to
+# the output file.
+#
+my @OUTPUT = ();
+open( CONF, "<$conf" ) or die "Cannot read configuration file: $!";
+my @INPUT = <CONF>;
+close( CONF );
+
+foreach my $line ( @INPUT )
+{
+    chomp( $line );
+
+    #
+    # Find variable settings - even commented out ones
+    #
+    if ( $line =~ /([ \t#]*)([^=]+)=([^\n]+)/ )
+    {
+	my $key = $2;
+	my $val = $3;
+
+	# Strip leading and trailing whitespace.
+	$key =~ s/^\s+//;
+	$key =~ s/\s+$//;
+	$val =~ s/^\s+//;
+	$val =~ s/\s+$//;
+	
+	if ( defined( $KEYS{ $key } ) )
+	{
+	    my $newLine = $key . " = " . $KEYS{ $key };
+	    push @OUTPUT, $newLine;
+	}
+	else
+	{
+	    push @OUTPUT, $line;
+	}
+
+    }
+    else
+    {
+	push @OUTPUT, $line;
+    }
+
+}
+
+
+#
+#  Now write the otuput
+#
+open( OUT, ">$out" ) or die "Cannot write to output: $!";
+foreach my $line ( @OUTPUT )
+{
+    print OUT $line . "\n";
+}
+close( OUT );

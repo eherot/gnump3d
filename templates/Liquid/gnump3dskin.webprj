@@ -1,0 +1,30 @@
+<!DOCTYPE webproject>
+<webproject>
+  <project usePreviewPrefix="0" previewPrefix="" type="Local" name="Gnump3d skin" encoding="iso 8859-1" >
+    <upload/>
+    <author></author>
+    <email></email>
+    <defaultDTD>-//W3C//DTD HTML 4.01 Transitional//EN</defaultDTD>
+    <item url="AUTHOR" uploadstatus="1" />
+    <item url="COPYING.html" uploadstatus="1" />
+    <item url="bug.html" uploadstatus="1" />
+    <item url="config.ini" uploadstatus="1" />
+    <item url="error.html" uploadstatus="1" />
+    <item url="footer.tmpl" uploadstatus="1" />
+    <item url="header.tmpl" uploadstatus="1" />
+    <item url="index.html" uploadstatus="1" />
+    <item url="info.html" uploadstatus="1" />
+    <item url="now.html" uploadstatus="1" />
+    <item url="playlist.html" uploadstatus="1" />
+    <item url="prefs.html" uploadstatus="1" />
+    <item url="random.html" uploadstatus="1" />
+    <item url="recent.html" uploadstatus="1" />
+    <item url="results.html" uploadstatus="1" />
+    <item url="search.html" uploadstatus="1" />
+    <item url="size.html" uploadstatus="1" />
+    <item url="stats.html" uploadstatus="1" />
+    <item url="style.css" uploadstatus="1" />
+    <item url="tagbrowse.html" uploadstatus="1" />
+    <item url="" uploadstatus="1" />
+  </project>
+</webproject>

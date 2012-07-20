@@ -1,0 +1,29 @@
+<!-- include="html_header.tmpl" -->
+<!-- include="page_header.tmpl" -->
+
+<h1>Advanced Search</h1>
+<form action="/search/" method="get">
+<table border="0" cellpadding="2" cellspacing="0">
+<tr><td align="right">Search Terms</td><td align="left"><input type="text" name="q" size="40" /></td></tr>
+<tr><td align="right">Search for</td><td align="left">
+ <input type="radio" name="type" value="all" checked> All Terms
+ <input type="radio" name="type" value="any"> Any Terms
+</td></tr>
+<tr><td align="right">Search artist</td><td align="left"><input type="text" name="artist" size="40" /></td></tr>
+<tr><td align="right">Search album</td><td align="left"><input type="text" name="album" size="40" /></td></tr>
+<tr><td align="right">Search song</td><td align="left"><input type="text" name="title" size="40" /></td></tr>
+<tr><td align="right">Search year</td><td align="left"><input type="text" name="year" size="40" /></td></tr>
+<tr><td align="right">Start Directory</td><td align="left">$SELECT_COMBO</td></tr>
+<tr><td align="right">Genres</td><td align="left">$GENRE_COMBO</td></tr>
+<tr><td align="right">Play Results</td><td align="left">
+ <input type="radio" name="play" value="0" checked="checked">No &nbsp;
+ <input type="radio" name="play" value="1">Yes
+</td></tr>
+<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td><input type="submit" value="Search" class='button' /></td></tr>
+<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+</table>
+</form>
+
+<!-- include="page_footer.tmpl" -->
+<!-- include="html_footer.tmpl" -->

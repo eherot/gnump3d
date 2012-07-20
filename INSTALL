@@ -1,0 +1,57 @@
+PREREQUISITES
+=============
+
+
+  GNUMP3d has only one requirement - a working Perl installation with the
+ fork() function implemented.
+
+  In practice this means some for of Unix system, or a Microsoft Windows
+ system with a very recent version of ActiveState's Perl port.
+
+
+INSTALLATION
+============
+
+  GNUMP3d installation should require no more than the 
+ following:-
+
+	make install
+
+  This will install the software in /usr/bin, with the
+ configuration files in /etc/gnump3d/
+
+
+CONFIGURATION
+=============
+
+  The configuration file will certainly need to be edited prior to starting
+ the server for the first time.
+
+  The configuration file is called 'gnump3d.conf' and should be found in 
+ '/etc/gnump3d' under Unix-like operating systems, or 'etc\gnump3d' when 
+ running under Microsoft Windows platforms.
+
+  Before the server is available for serving music it must scan your
+ audio files to build up a cache of song information.  This is a simple process
+ which shouldn't take long.
+
+
+STATISTICS
+==========
+
+  Once the indexing of the music is complete you may dump statistics of your
+ archive via the 'gnump3d-stats' program, by using the '--stats' argument.
+
+  For example:
+
+skx@undecided:~ $ gnump3d-index --stats
+Total number of songs: 2115
+Total size of archive: 7.6Gb (8187011676 bytes)
+Total playlength     : 5 days, 18 hours, 6 mins 13 seconds
+
+  This will demonstrate that the indexing has worked properly.
+
+
+Steve
+---
+$Revision: 1.3 $

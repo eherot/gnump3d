@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en">
+	<head>
+$META
+		<title>Archive Statistics</title>
+		<meta http-equiv="window-target" content="_top" />
+		<meta name="Author" content="Steve Kemp" />
+		<meta name="Description" content="GNUMP3d on $HOSTNAME" />
+		<style type="text/css" media="all">@import url(/layout.css);
+		</style>
+	</head>
+
+	<body>
+	<div class="boxTop">
+		<h1>Archive Statistics</h1>
+			<div class="menu">
+<p>
+
+
+
+<a title="Browse by artist, year, etc" href="/tagbrowse">Browse by Catagory</a>
+| <a title="Create a custom playlist" href="/playlist">Custom Playlist</a>
+| <a title="See What Is Currently Being Served" href="/now">Currently Playing</a>
+| <a title="Change your preferences" href="/stats">Preferences</a>
+| <a title="Display some random tracks" href="/random">Random Selection</a>
+| <a title="Visit a random directory" href="/random/directory">Random Directory</a>
+
+| <a title="Search the archive" href="/search">Search</a>
+</p>
+</div>
+	</div>
+
+	<div class="boxLeft">
+	<!-- include="menu.tmpl" -->
+	</div>
+
+	
+	<div id="main">  
+<h3>Most Popular Songs</h3>
+<table>
+$MOST_POPULAR_SONGS
+</table>
+
+<h3>Most Popular Directories</h3>
+<table>
+$MOST_POPULAR_DIRS
+</table>
+
+<h3>Most Popular Machines</h3>
+<table>
+$MOST_ACTIVE_CLIENTS
+</table>
+
+<h3>Most Popular Agents</h3>
+<table>
+$MOST_POPULAR_USER_AGENTS
+</table>
+
+		<br />
+
+
+	</div>
+
+	<div class="boxfooter">
+				
+		<br />	
+		Last modified: <!-- echo="LAST_MODIFIED" --> - <a href="http://www.steve.org.uk/">Steve Kemp</a>
+		<br />
+	</div>
+	<div class="spacer"></div>
+	</body>
+</html>
+

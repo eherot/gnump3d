@@ -1,0 +1,66 @@
+#! /bin/sh
+#
+# gnump3d	simple streaming mp3/ogg server.
+#
+#		Written by Miquel van Smoorenburg <miquels@cistron.nl>.
+#		Modified for Debian GNU/Linux
+#		by Ian Murdock <imurdock@gnu.ai.mit.edu>.
+#
+# Version:	@(#)skeleton  1.8  03-Mar-1998  miquels@cistron.nl
+#
+# This file was automatically customized by dh-make on Sun, 24 Feb 2002 15:48:39 +0100
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/bin/gnump3d
+NAME=gnump3d
+DESC=gnump3d
+
+test -f $DAEMON || exit 0
+
+set -e
+
+#
+#  Source any default options here.
+#
+if test -f  /etc/default/gnump3d ; then
+   . /etc/default/gnump3d
+fi
+
+
+case "$1" in
+  start)
+	echo -n "Starting $DESC: "
+	start-stop-daemon --background --start --quiet --make-pidfile --pidfile /var/run/$NAME.pid --exec $DAEMON -- $STARTUPOPTS
+	echo "$NAME."
+	;;
+  stop)
+	echo -n "Stopping $DESC: "
+	start-stop-daemon --oknodo --stop --quiet --pidfile /var/run/$NAME.pid
+	rm -f /var/run/$NAME.pid
+	echo "$NAME."
+
+	;;
+  restart|force-reload)
+	#
+	#	If the "reload" option is implemented, move the "force-reload"
+	#	option to the "reload" entry above. If not, "force-reload" is
+	#	just the same as "restart".
+	#
+	echo -n "Restarting $DESC: "
+	start-stop-daemon --oknodo --stop --quiet --make-pidfile --pidfile /var/run/$NAME.pid -- $STARTUPOPTS
+	sleep 1
+	rm -f /var/run/$NAME.pid
+	sleep 1
+	start-stop-daemon --background --start --quiet --make-pidfile --pidfile /var/run/$NAME.pid --exec $DAEMON
+
+echo "$NAME."
+	;;
+  *)
+	N=/etc/init.d/$NAME
+	# echo "Usage: $N {start|stop|restart|reload|force-reload}" >&2
+	echo "Usage: $N {start|stop|restart|force-reload}" >&2
+	exit 1
+	;;
+esac
+
+exit 0

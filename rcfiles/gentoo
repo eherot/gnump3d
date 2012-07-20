@@ -1,0 +1,36 @@
+#!/sbin/runscript
+#
+#
+# Author: Pat Riehecky
+# Init script for GNUMP3d on Gentoo Linux
+#
+#
+
+depend() {
+        need net localmount
+}
+
+checkconfig() {
+	if [ ! -e /usr/bin/gnump3d ];then
+	eerror "The program to be run /usr/bin/gnump3d was not found!"
+	return 1
+	fi
+	if [ ! -e /etc/gnump3d/gnump3d.conf ];then
+	eerror "The configuration file for gnump3d was not found!"
+	return 1
+	fi
+}
+
+start() {
+	checkconfig || return 1
+	ebegin "Starting GNUMP3d"
+	 /usr/bin/gnump3d --quiet &
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping GNUMP3d"
+	killall gnump3d
+	eend $?
+}
+

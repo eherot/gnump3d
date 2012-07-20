@@ -1,0 +1,105 @@
+<html>
+<head>
+$META
+	<title>GNUMP3d [ Server Statistics ]</title>
+	<link rel="stylesheet" href="/style.css" type="text/css">
+</head>
+
+<body>
+
+<table width="80%" align="center" border="0" cellpadding="2" bgcolor="#103060">
+	<tr>
+<td align="center" colspan="7">
+			<form action="/search" method="GET">
+			<span class="header">:: <A HREF="http://www.gnump3d.org/">GNUMP3d</a> Server v$RELEASE on <i>$HOSTNAME</i> ::
+  			<br>:: Music Search ::</span> <input TYPE="text" NAME="q" /> <input type="submit" value="Search" />
+			</form>
+		</td>
+	</tr>
+	<tr align="center" class="qlinks">
+		<td width="15%"><A HREF="/" title="Go to the root of the music archive">Home</A></td>
+		<td width="14%"><a href="/playlist/" title="Create a custom playlist">Custom Playlists</a></td>
+		<td width="14%"><A HREF="/stats/" title="See the most popular songs on this server">Most Popular</A></td>
+		<td width="14%"><A HREF="/recent/" title="See the last 20 tracks played">Most Recent</A></td>
+		<td width="14%"><a href="/prefs/" title="Change your preferences">Preferences</a></td>
+		<td width="14%"><A HREF="/search/" title="Search the repository for music">Search</A></td>
+		<td width="14%"><a href="/extras.html" title="Extra links">Extras</a></td>
+		<td width="15%"><A HREF="http://www.gnump3d.org/" title="Visit the official home of GNUMP3d">GNUMP3d Home</A></td>
+	</tr>
+</table>
+
+<table width="100%" border="0">
+<tr>
+
+<p>&nbsp;</p>
+
+<td valign="TOP">
+
+<table border="0" cellpadding="0" cellspacing="2" width="100%" bgcolor="#001040">
+<tr bgcolor="#103060">
+	<td>
+		<table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#32537C">
+			<tr>
+				<td align="center" bgcolor="#183868" colspan="2" class="subtitle">Most Popular Songs</td>
+			</tr>
+			<tr>
+				<td>$MOST_POPULAR_SONGS</td>
+			</tr>
+		</table>
+</td></tr>
+</table>
+
+<P>&nbsp;</P>
+
+<table border="0" cellpadding="0" cellspacing="2" width="100%" bgcolor="#001040">
+<tr bgcolor="#103060">
+	<td>
+		<table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#32537C">
+			<tr>
+				<td align="CENTER" bgcolor="#183868" colspan="2" class="subtitle">Most Popular Directories</td>
+			</tr>
+			<tr>
+				<td>$MOST_POPULAR_DIRS</td>
+			</tr>
+		</table>
+</td></tr>
+</table>
+
+<P>&nbsp;</P>
+
+<table border="0" cellpadding="0" cellspacing="2" width="100%" bgcolor="#001040">
+<tr bgcolor="#103060">
+	<td>
+		<table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#32537C">
+			<tr>
+				<td align="CENTER" bgcolor="#183868" colspan="2" class="subtitle">Most Active Clients</td>
+			</tr>
+			<tr>
+				<td>$MOST_ACTIVE_CLIENTS</td>
+			</tr>
+		</table>
+</td></tr>
+</table>
+
+<P>&nbsp;</P>
+
+<table border="0" cellpadding="0" cellspacing="2" width="100%" bgcolor="#001040">
+<tr bgcolor="#103060">
+	<td>
+		<table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#32537C">
+			<tr>
+				<td align="CENTER" bgcolor="#183868" colspan="2" class="subtitle">Most Popular User Agents</td>
+			</tr>
+			<tr>
+				<td>$MOST_POPULAR_USER_AGENTS</td>
+			</tr>
+		</table>
+</td></tr>
+</table>
+
+</td>
+</tr>
+</table>
+
+</body>
+</html>

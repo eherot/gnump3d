@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <style type="text/css">
+	body {font-family: arial, sans-serif; color: green; background-color: black; }
+	td.title {color: gray; font-weight:bold; height:30px}
+	table.dashed { border: 1px dashed }
+
+	:link { color : #808; }
+	:visited { color: #800; }
+	
+	a { text-decoration: none; font-size: 20px}
+
+	a.top {color: #808; font-weight: bold; font-size: 20px}
+      
+	a.dir:visited {color: #A0c0f0; font-weight: bold; font-size: 20px}
+	a.dir:link {color: #A0c0; font-weight: bold; font-size: 20px}
+
+	a.info {color: black; font-size: 20px;}
+	a.gnump3d {color: #939393; ; font-weight: bold; font-size: 20px}
+
+	legend {font-weight: bold; }
+      </style>
+    <title>GNUMP3d [ $HOSTNAME : $DIRECTORY ]</title>
+  </head>
+  <body bgcolor=black fgcolor=green>
+  <script language="JavaScript"><!--
+  var keyStroke;
+
+function appendStroke(keyStroke)
+{
+
+ var string1=document.forms[0].elements[2].value;
+ string1 += keyStroke;
+ document.forms[0].elements[2].value = string1;
+ }
+
+// -->
+</script>
+  <h2>
+  <table width="100%" border="0" cellpadding="0">
+    <tr>
+      <td valign="top">
+        <form action="/search" method="get">
+	<input type="hidden" name="type" value="all">
+          <table class="dashed" width="100%" border="0" cellpadding="2">
+            <tr>
+              <td align="left" width="50%" valign="top">
+		<input type="reset">&nbsp;
+                <input type="text" name="q" size="28">&nbsp;
+		<input type="submit" value="Search">
+<table><tr><td>
+<center>
+<input type="button" value="1" onClick="appendStroke('1');">
+<input type="button" value="2" onClick="appendStroke('2');">
+<input type="button" value="3" onClick="appendStroke('3');">
+<input type="button" value="4" onClick="appendStroke('4');">
+<input type="button" value="5" onClick="appendStroke('5');">
+<input type="button" value="6" onClick="appendStroke('6');">
+<input type="button" value="7" onClick="appendStroke('7');">
+<input type="button" value="8" onClick="appendStroke('8');">
+<input type="button" value="9" onClick="appendStroke('9');">
+<input type="button" value="0" onClick="appendStroke('0');">
+</td></tr>
+<tr><td>
+<center>
+<input type="button" value="q" onClick="appendStroke('q');">
+<input type="button" value="w" onClick="appendStroke('w');">
+<input type="button" value="e" onClick="appendStroke('e');">
+<input type="button" value="r" onClick="appendStroke('r');">
+<input type="button" value="t" onClick="appendStroke('t');">
+<input type="button" value="y" onClick="appendStroke('y');">
+<input type="button" value="u" onClick="appendStroke('u');">
+<input type="button" value="i" onClick="appendStroke('i');">
+<input type="button" value="o" onClick="appendStroke('o');">
+<input type="button" value="p" onClick="appendStroke('p');">
+</td></tr>
+<tr><td>
+<center>
+<input type="button" value="a" onClick="appendStroke('a');">
+<input type="button" value="s" onClick="appendStroke('s');">
+<input type="button" value="d" onClick="appendStroke('d');">
+<input type="button" value="f" onClick="appendStroke('f');">
+<input type="button" value="g" onClick="appendStroke('g');">
+<input type="button" value="h" onClick="appendStroke('h');">
+<input type="button" value="j" onClick="appendStroke('j');">
+<input type="button" value="k" onClick="appendStroke('k');">
+<input type="button" value="l" onClick="appendStroke('l');">
+</td></tr>
+<tr><td>
+<center>
+<input type="button" value="z" onClick="appendStroke('z');">
+<input type="button" value="x" onClick="appendStroke('x');">
+<input type="button" value="c" onClick="appendStroke('c');">
+<input type="button" value="v" onClick="appendStroke('v');">
+<input type="button" value="b" onClick="appendStroke('b');">
+<input type="button" value="n" onClick="appendStroke('n');">
+<input type="button" value="m" onClick="appendStroke('m');">
+	      </td></tr>
+	      <tr><td><center>
+	      <input type="button" value="                                                            " onClick="appendStroke(' ');">
+	      </td></tr>
+	      </table>
+              </td>
+            </tr>
+          </table>
+        </form>
+        <p class="dashed">
+	    $BANNER &nbsp; <a class="top" href="/random/" title="Listen To Random Music">Random Music</a>
+	  </p>
+<br>
+    <PLAYLISTS>
+      <fieldset>
+	<legend align="left">
+	  Playlists
+	</legend>
+	<table border="0" cellpadding="0" cellspacing="0" width="100%">	  
+	  $PLAYLISTS
+	</table>
+      </fieldset>	
+    </PLAYLISTS>
+
+    <p></p>
+        
+    <DIRS>
+      <fieldset>
+	<legend align="left">
+	  Subdirectories : $DIRECTORY
+	</legend>
+	<table border="0" cellpadding="0" cellspacing="0" width="100%">	  
+	  $DIRECTORIES
+	</table>
+      </fieldset>
+    <p></p>
+    </DIRS>
+    
+    
+    <FILES>
+      <fieldset>
+	<legend align="left">
+	  Songs in $DIRECTORY
+	</legend>
+	<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	  $SONGS
+	</table>
+      </fieldset>
+    <p></p>
+
+    </FILES>
+
+  </td>
+    </tr>
+  </table>
+</html>
+<!--
+Local Variables: ***
+mode: html ***
+End: ***
+-->

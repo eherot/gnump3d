@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+  <head>
+    <meta name="viewport" content="width = 320" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+$META
+    <!--style type="text/css">
+	body 
+	{
+	  font-family: arial, sans-serif; 
+	  color: green; 
+	  background-color: lightgray;
+	  min-width: 320px;
+	  margin: 0px;
+	  padding: 0px;
+	}
+	td.title {color: gray; font-weight:bold; height:30px;}
+	td.item_name { padding-top: 5px; padding-bottom: 5px; }
+	td.play_button { padding: 5px 7px 5px 0px; width: 30px; }
+	td.download_button { padding: 5px 7px 5px 0px; width: 3px; }
+	table.dashed { border: 1px dashed }
+
+	td { font-size: 14px; }
+
+	:link { color : #222; }
+	:visited { color: black; }
+	
+	a { text-decoration: none; font-size: 14px;}
+
+	a.top {color: #808; font-weight: bold; }
+      
+	a.dir:visited {color: #A0c0; font-weight: bold; }
+	a.dir:link {color: #A0c0; font-weight: bold; }
+
+	a.info {color: black; }
+	a.gnump3d {color: #939393; ; font-weight: bold; }
+
+	legend {font-weight: bold; }
+      </style-->
+    <link rel="StyleSheet" href="/main.css" text="text/css" media="screen" />
+    <title>GNUMP3d [ $HOSTNAME : $DIRECTORY ]</title>
+  </head>
+  <body>
+  <script language="JavaScript"><!--
+  var keyStroke;
+
+// -->
+</script>
+  <h2>
+  <table width="100%" border="0" cellpadding="0">
+    <tr>
+      <td valign="top">
+        <form action="/search" method="get">
+	<input type="hidden" name="type" value="all">
+          <table class="dashed" width="100%" border="0" cellpadding="2">
+            <tr>
+              <td align="left" width="50%" valign="top">
+                <input type="text" name="q" size="28">&nbsp;
+		<input type="submit" value="Search">
+              </td>
+            </tr>
+          </table>
+        </form>
+        <p class="dashed">
+	    $BANNER &nbsp; <a class="top" href="/random/" title="Listen To Random Music">Random</a>
+	  </p>
+
+    <PLAYLISTS>
+      <fieldset>
+	<legend align="left">
+	  Playlists
+	</legend>
+	<table border="0" cellpadding="0" cellspacing="0" width="100%">	  
+	  $PLAYLISTS
+	</table>
+      </fieldset>	
+    </PLAYLISTS>
+
+    <p></p>
+        
+    <DIRS>
+      <fieldset>
+	<legend align="left">
+	  Subdirectories : $DIRECTORY
+	</legend>
+	<table border="0" cellpadding="0" cellspacing="0" width="100%">	  
+	  $DIRECTORIES
+	</table>
+      </fieldset>
+    <p></p>
+    </DIRS>
+    
+    
+    <FILES>
+      <fieldset>
+	<legend align="left">
+	  Songs in $DIRECTORY
+	</legend>
+	<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	  $SONGS
+	</table>
+      </fieldset>
+    <p></p>
+
+    </FILES>
+
+  </td>
+    </tr>
+  </table>
+</html>
+<!--
+Local Variables: ***
+mode: html ***
+End: ***
+-->

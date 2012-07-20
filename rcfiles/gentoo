@@ -1,36 +1,37 @@
 #!/sbin/runscript
-#
-#
-# Author: Pat Riehecky
-# Init script for GNUMP3d on Gentoo Linux
-#
-#
+# Copyright 1999-2011 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: /var/cvsroot/gentoo-x86/media-sound/gnump3d/files/gnump3d.init.d,v 1.5 2011/12/13 23:11:35 radhermit Exp $
+
+extra_commands="index"
 
 depend() {
-        need net localmount
-}
-
-checkconfig() {
-	if [ ! -e /usr/bin/gnump3d ];then
-	eerror "The program to be run /usr/bin/gnump3d was not found!"
-	return 1
-	fi
-	if [ ! -e /etc/gnump3d/gnump3d.conf ];then
-	eerror "The configuration file for gnump3d was not found!"
-	return 1
-	fi
+	need net
+	after netmount nfsmount
 }
 
 start() {
-	checkconfig || return 1
-	ebegin "Starting GNUMP3d"
-	 /usr/bin/gnump3d --quiet &
+	ebegin "Starting gnump3d"
+
+	if [ ${DO_INDEX} -eq 1 ]; then
+		ebegin "Updating index of music files (may take a while if you haven't done it in a while)"
+		/usr/bin/gnump3d-index
+		eend $?
+	fi
+
+	start-stop-daemon --start --quiet --exec /usr/bin/gnump3d2 --make-pidfile \
+		--pidfile /var/run/gnump3d.pid --background -- --quiet
 	eend $?
 }
 
 stop() {
-	ebegin "Stopping GNUMP3d"
-	killall gnump3d
+	ebegin "Stopping gnump3d"
+	start-stop-daemon --stop --quiet --pidfile /var/run/gnump3d.pid
 	eend $?
 }
 
+index() {
+	ebegin "Indexing music files"
+	/usr/bin/gnump3d-index
+	eend $?
+}

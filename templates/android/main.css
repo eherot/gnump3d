@@ -1,5 +1,4 @@
-body 
-{
+body {
   font-family: arial, sans-serif; 
   color: green; 
   background-color: lightgray;
@@ -7,13 +6,14 @@ body
   margin: 0px;
   padding: 0px;
 }
+
+td { font-size: 14px; }
 td.title {color: gray; font-weight:bold; height:30px;}
 td.item_name { padding-top: 5px; padding-bottom: 5px; }
 td.play_button { padding: 5px 7px 5px 0px; width: 30px; }
 td.download_button { padding: 5px 7px 5px 0px; width: 3px; }
-table.dashed { border: 1px dashed }
 
-td { font-size: 14px; }
+table.dashed { border: 1px dashed }
 
 :link { color : #222; }
 :visited { color: black; }
